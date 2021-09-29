@@ -102,3 +102,26 @@
     color: black!important;
     font-size: 1.1rem!important;
 }
+
+.naks_bg_success {
+    background-color: #27b18a!important;
+    color: black!important;
+    font-size: 1.1rem!important;
+}
+
+.naks_distance_stats {
+    text-align: left;
+    display: flex !important;
+    width: 100%;
+    border: 1px solid white;
+    padding: 3px;	
+    font-size: 1.5rem!important;
+}
+
+.w_25 {
+    width: 25%
+}
+
+.naks_highlight_row {
+    background-color: rgb(39, 177, 138);;
+}

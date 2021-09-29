@@ -34,6 +34,67 @@ let hash_icon = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" 
 
 let open_icon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-up-right" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5z"/><path fill-rule="evenodd" d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0v-5z"/></svg>`;
 
+const distances = [
+	{ id: 'all', text: 'All' },
+	{ id: '1000', text: '1000' },
+	{ id: '1200', text: '1200' },
+	{ id: '1400', text: '1400' },
+	{ id: '1600', text: '1600' },
+	{ id: '1800', text: '1800' },
+	{ id: '2000', text: '2000' },
+	{ id: '2200', text: '2200' },
+	{ id: '2400', text: '2400' }
+];
+
+(function () {
+	/**
+	 * Decimal adjustment of a number.
+	 *
+	 * @param {String}  type  The type of adjustment.
+	 * @param {Number}  value The number.
+	 * @param {Integer} exp   The exponent (the 10 logarithm of the adjustment base).
+	 * @returns {Number} The adjusted value.
+	 */
+	function decimalAdjust(type, value, exp) {
+		// If the exp is undefined or zero...
+		if (typeof exp === 'undefined' || +exp === 0) {
+			return Math[type](value);
+		}
+		value = +value;
+		exp = +exp;
+		// If the value is not a number or the exp is not an integer...
+		if (isNaN(value) || !(typeof exp === 'number' && exp % 1 === 0)) {
+			return NaN;
+		}
+		// Shift
+		value = value.toString().split('e');
+		value = Math[type](+(value[0] + 'e' + (value[1] ? (+value[1] - exp) : -exp)));
+		// Shift back
+		value = value.toString().split('e');
+		return +(value[0] + 'e' + (value[1] ? (+value[1] + exp) : exp));
+	}
+
+	// Decimal round
+	if (!Math.round10) {
+		Math.round10 = function (value, exp) {
+			return decimalAdjust('round', value, exp);
+		};
+	}
+	// Decimal floor
+	if (!Math.floor10) {
+		Math.floor10 = function (value, exp) {
+			return decimalAdjust('floor', value, exp);
+		};
+	}
+	// Decimal ceil
+	if (!Math.ceil10) {
+		Math.ceil10 = function (value, exp) {
+			return decimalAdjust('ceil', value, exp);
+		};
+	}
+})();
+
+
 const updateHorse = (data, nodes, distance) => {
 
 	cache.push(data);
@@ -49,19 +110,23 @@ const updateHorse = (data, nodes, distance) => {
 		let stats = data.stats;
 		if (!stats) return;
 
+		let class_stats = false;
+
 		if (global_class && global_class != 'all' && data.classes) {
 			stats = data.classes[global_class];
 
 			let total = stats[distance].firsts + stats[distance].seconds + stats[distance].thirds + stats[distance].fourths + stats[distance].other;
 			if (total < 9) {
 				stats = data.stats;
+			} else {
+				class_stats = true;
 			}
 		}
 
-		let let_open_icon = document.createElement("span");
-		let_open_icon.className = 'racing-tag';
-		let_open_icon.innerHTML += '<a href="https://www.stackednaks.com/horse/' + data.id + '" target="_">' + open_icon + '</a>';
-		nodes[1].childNodes[2].appendChild(let_open_icon);
+		//let let_open_icon = document.createElement("span");
+		//let_open_icon.className = 'racing-tag';
+		//let_open_icon.innerHTML += '<a href="https://www.stackednaks.com/horse/' + data.id + '" target="_">' + open_icon + '</a>';
+		//nodes[1].childNodes[2].appendChild(let_open_icon);
 
 
 		let fire_rate = stats['all'] && stats['all'].fires ? (stats['all'].fires / (stats['all'].firsts + stats['all'].seconds + stats['all'].thirds + stats['all'].fourths + stats['all'].other) * 100) : 0;
@@ -80,7 +145,7 @@ const updateHorse = (data, nodes, distance) => {
 
 		let all_total = (stats['all'].firsts + stats['all'].seconds + stats['all'].thirds + stats['all'].fourths + stats['all'].other);
 
-		if ((win_rate > 15 || fire_rate > 60) && all_total > 10) {
+		if ((win_rate > 15 || fire_rate > 60) && all_total > 9) {
 			all_record.className += ' naks_alert_color';
 			if (!mh) race_stats.reds++;
 		} else if ((win_rate >= 10 || fire_rate > 60)) {
@@ -241,12 +306,15 @@ const addHorseList = (data, list) => {
 		horse_div.innerHTML += (' (' + Number(data.fatigue) + ') ');
 	}
 
-
-	tags.forEach(element => {
-		if (element) {
-			horse_div.innerHTML += ("<span class='naks_badge naks_bg_info naks_mr_2'>" + element.text + "</span>")
-		}
-	});
+	if (!data.is_racing) {
+		tags.forEach(element => {
+			if (element) {
+				horse_div.innerHTML += ("<span class='naks_badge naks_bg_info naks_mr_2'>" + element.text + "</span>")
+			}
+		});
+	} else {
+		horse_div.innerHTML += ("<span class='naks_badge naks_bg_success naks_mr_2'>IN RACE</span>")
+	}
 
 
 	horse_div.innerHTML += '<br/>'
@@ -584,8 +652,6 @@ const freeRaces = () => {
 			headers: new Headers({ 'x-api-key': api_key }),
 		};
 
-		let send_class = global_class == 'all' ? '' : global_class;
-
 		fetch('https://api.stackednaks.com/races?fee=0', options)
 			//fetch('http://localhost:3001/races?fee=0', options)
 			.then(response => response.json())
@@ -602,7 +668,7 @@ const freeRaces = () => {
 }
 
 //refresh fatigue, using jwt (frowned upon by me but people want it)
-const fatigue = () => {
+const fatigue = async () => {
 	if (api_key) {
 
 		let jwt = localStorage.getItem('jwt');
@@ -611,19 +677,163 @@ const fatigue = () => {
 		const options = {
 			headers: new Headers({ 'authorization': 'Bearer ' + token }),
 		};
+		
+		let class_1 = await fetch('https://api.zed.run/api/v1/races/paid/available_race_horses?public_address=' + api_key + '&offset=0&horse_name=&race_class=1', options).then(response => response.json());
+		let class_2 = await fetch('https://api.zed.run/api/v1/races/paid/available_race_horses?public_address=' + api_key + '&offset=0&horse_name=&race_class=2', options).then(response => response.json());
+		let class_3 = await fetch('https://api.zed.run/api/v1/races/paid/available_race_horses?public_address=' + api_key + '&offset=0&horse_name=&race_class=3', options).then(response => response.json());
+		let class_4 = await fetch('https://api.zed.run/api/v1/races/paid/available_race_horses?public_address=' + api_key + '&offset=0&horse_name=&race_class=4', options).then(response => response.json());
+		let class_5 = await fetch('https://api.zed.run/api/v1/races/paid/available_race_horses?public_address=' + api_key + '&offset=0&horse_name=&race_class=5', options).then(response => response.json());
+		let class_0 = await fetch('https://api.zed.run/api/v1/races/paid/available_race_horses?public_address=' + api_key + '&offset=0&horse_name=&race_class=0', options).then(response => response.json());
 
-		fetch('https://api.zed.run/api/v1/races/paid/available_race_horses?public_address=' + api_key + '&offset=0&horse_name=&race_class=', options)
-			.then(response => response.json())
-			.then(data => {
-				data.forEach(h => {
-					let mh = my_horses.find(m => m.id == h.horse_id);
-					mh.fatigue = 100 - h.current_fatigue;
-					console.log(mh.name, mh.fatigue);
-				})
-			})
-			.catch(err => {
-				console.log(err);
-			});
+		let data = class_0.concat(class_1).concat(class_2).concat(class_3).concat(class_4).concat(class_5);
+
+		data.forEach(h => {
+			let mh = my_horses.find(m => m.id == h.horse_id);
+			if (mh) {
+				mh.fatigue = 100 - h.current_fatigue;
+
+				mh.details.class = h.class;
+				mh.details.rating = h.rating;
+			} else {
+				console.log(h.hash_info.name, h.current_fatigue);
+			}
+		});
+
+		my_horses.forEach(h => {
+			h.is_racing = data.find(m => h.id == m.horse_id) == undefined;
+		});
+
+		my_horses.sort((a, b) => {
+			return b.fatigue - a.fatigue;
+		})
+
+	}
+}
+
+//*************************************** */
+// Displays horse detailed infor on the horse card
+//*************************************** */
+const horseDetails = () => {
+	var find_hcc = document.getElementsByClassName("horse-card-content");
+
+	if (find_hcc && find_hcc.length > 0) {
+		let horse_card_content = find_hcc[0];
+
+		if (horse_card_content.className.indexOf('naks_found') == -1) {
+
+			let find_hn = document.getElementsByClassName("name");
+
+			if (find_hn && find_hn.length > 0) {
+
+				let existing = cache.find(h => h.name == find_hn[0].innerHTML);
+
+				if (existing) {
+					horse_card_content.className += ' naks_found';
+
+					let find_bg = document.getElementsByClassName("btns-group");
+
+					if (find_bg && find_bg.length > 0) {
+
+						find_bg[0].innerHTML += '<a href="https://www.stackednaks.com/horse/' + existing.id + '" target="_" style="margin-left:10px" class="outline-btn bold md details"><img class="icon" src="data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiIHdpZHRoPSIyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Im0wIDBoMjR2MjRoLTI0eiIvPjxwYXRoIGQ9Im0xNCAzdjJoMy41OWwtOS44MyA5LjgzIDEuNDEgMS40MSA5LjgzLTkuODN2My41OWgydi03em01IDE2aC0xNHYtMTRoN3YtMmgtN2MtMS4xMSAwLTIgLjktMiAydjE0YzAgMS4xMDQ1Njk1Ljg5NTQzMDUgMiAyIDJoMTRjMS4xMDQ1Njk1IDAgMi0uODk1NDMwNSAyLTJ2LTdoLTJ6IiBmaWxsPSIjZjBmOGZmIiBmaWxsLXJ1bGU9Im5vbnplcm8iLz48L2c+PC9zdmc+">StackedNaks</a>';
+
+						let next_div = '<div class="naks_mt naks_distance_stats primary-text bold">';
+
+						next_div += '<div class="w_25"><span>Stats @  ' + selected_distance + '</span></div>';
+
+						next_div += '<div  class="w_25"><span>Record</span></div>';
+
+						next_div += '<div  class="w_25"><span>Win Rate</span></div>';
+
+						next_div += '<div class="w_25"><span>Place Rate</span></div>';
+
+						next_div += '<div class="w_25"><span>Fire Rate</span></div>';
+
+						next_div += '</div>';
+
+
+						find_bg[0].innerHTML += next_div;
+
+						['all', 1, 2, 3, 4, 5].forEach((d) => {
+
+							let stats = d == 'all' ? existing.stats : existing.classes[d.toString()]
+
+							let stat = stats[selected_distance.toString()];
+
+							let total = stat.firsts + stat.seconds + stat.thirds + stat.fourths + stat.other;
+
+							let win_rate = stat.firsts ? Math.round10(stat.firsts / (stat.firsts + stat.seconds + stat.thirds + stat.fourths + stat.other) * 100, -1) : 0;
+
+							let place_rate = Math.round10((stat.firsts + stat.seconds + stat.thirds) ? (stat.firsts + stat.seconds + stat.thirds) / (stat.firsts + stat.seconds + stat.thirds + stat.fourths + stat.other) * 100 : 0, -2);
+
+							let fire_rate = Math.round10(stat.fires ? stat.fires / (stat.firsts + stat.seconds + stat.thirds + stat.fourths + stat.other) * 100 : 0, -2);
+
+
+							let next_div = '<div class="naks_stats naks_mt naks_distance_stats ' + (global_class == d.toString() ? ' naks_highlight_row ' : '') + '">';
+
+							if (d == 'all') {
+								next_div += '<div class="w_25">All</div>';
+							} else {
+								next_div += '<div class="w_25">Class ' + d.toString() + ' </div>';
+							}
+
+							next_div += '<div class="w_25"><span>' + total + ' - ' + stat.firsts + '/' + stat.seconds + '/' + stat.thirds + '</span></div>';
+
+							next_div += '<div class="w_25"><span> ' + win_rate.toFixed(2) + '%</span></div>';
+
+							next_div += '<div class="w_25"><span> ' + place_rate.toFixed(2) + '%</span></div>';
+
+							next_div += '<div class="w_25"><span> ' + fire_rate.toFixed(2) + '%</span></div>';
+
+							next_div += '</div>';
+
+							find_bg[0].innerHTML += next_div;
+
+						});
+						/*
+												distances.forEach( (d) => {
+													
+													let stats = existing.stats;
+													if (global_class && global_class != 'all') {
+														stats = existing.classes[global_class];
+													}
+						
+													let stat = stats[d.id.toString()];
+						
+													let total = stat.firsts + stat.seconds + stat.thirds + stat.fourths + stat.other;
+													
+													let win_rate = stat.firsts ? Math.round10(stat.firsts / (stat.firsts + stat.seconds + stat.thirds + stat.fourths + stat.other) * 100, -1) : 0;
+						
+													let place_rate = Math.round10((stat.firsts + stat.seconds + stat.thirds) ?(stat.firsts + stat.seconds + stat.thirds) / (stat.firsts + stat.seconds + stat.thirds + stat.fourths + stat.other) * 100 : 0, -2);
+						
+													let fire_rate = Math.round10(stat.fires ? stat.fires / (stat.firsts + stat.seconds + stat.thirds + stat.fourths + stat.other) * 100 : 0, -2);
+						
+																
+													let next_div = '<div class="naks_stats naks_mt naks_distance_stats ' + (selected_distance == d.id.toString() ? ' naks_highlight_row ' : '') + '">';
+													next_div += '<div class="w_25">' + d.text + ' </div>';
+						
+						
+													next_div += '<div class="w_25"><span>' + total + ' - ' + stat.firsts + '/' + stat.seconds + '/' + stat.thirds + '</span></div>';
+						
+													next_div += '<div class="w_25"><span> ' + win_rate.toFixed(2) + '%</span></div>';
+						
+													next_div += '<div class="w_25"><span> ' + place_rate.toFixed(2) + '%</span></div>';
+						
+													next_div += '<div class="w_25"><span> ' + fire_rate.toFixed(2) + '%</span></div>';
+						
+													next_div += '</div>';
+						
+													find_bg[0].innerHTML+= next_div;
+						
+												});
+						*/
+						find_bg[0].className = 'naks_header';
+
+					}
+
+				}
+			}
+
+		}
 	}
 }
 
@@ -634,6 +844,7 @@ setInterval(() => {
 	initHeader();
 	loadHorses();
 	run();
+	horseDetails();
 
 	free_races.forEach(r => {
 		r.count_down--;
