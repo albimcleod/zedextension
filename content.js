@@ -4,11 +4,14 @@ let cache = [];
 let active_racename = '';
 let race_stats = {};
 let distance_stats = {};
+let range_stats = {};
 let api_key = '';
 let my_horses = [];
 let my_fatigue = [];
 let selected_distance = 'all';
 let global_class = 'all';
+let extension_mode = 'race';
+let stable = {};
 
 let opponent_list = [];
 
@@ -33,6 +36,11 @@ let warning_icon = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="1
 let hash_icon = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-hash" viewBox="0 0 16 16"><path d="M8.39 12.648a1.32 1.32 0 0 0-.015.18c0 .305.21.508.5.508.266 0 .492-.172.555-.477l.554-2.703h1.204c.421 0 .617-.234.617-.547 0-.312-.188-.53-.617-.53h-.985l.516-2.524h1.265c.43 0 .618-.227.618-.547 0-.313-.188-.524-.618-.524h-1.046l.476-2.304a1.06 1.06 0 0 0 .016-.164.51.51 0 0 0-.516-.516.54.54 0 0 0-.539.43l-.523 2.554H7.617l.477-2.304c.008-.04.015-.118.015-.164a.512.512 0 0 0-.523-.516.539.539 0 0 0-.531.43L6.53 5.484H5.414c-.43 0-.617.22-.617.532 0 .312.187.539.617.539h.906l-.515 2.523H4.609c-.421 0-.609.219-.609.531 0 .313.188.547.61.547h.976l-.516 2.492c-.008.04-.015.125-.015.18 0 .305.21.508.5.508.265 0 .492-.172.554-.477l.555-2.703h2.242l-.515 2.492zm-1-6.109h2.266l-.515 2.563H6.859l.532-2.563z"/></svg>';
 
 let open_icon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-up-right" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5z"/><path fill-rule="evenodd" d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0v-5z"/></svg>`;
+
+let down_icons = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down-circle" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V4.5z"/></svg>`
+
+const host_url = 'https://api.stackednaks.com';
+//const host_url = 'http://localhost:3001'
 
 const distances = [
 	{ id: 'all', text: 'All' },
@@ -95,6 +103,17 @@ const distances = [
 })();
 
 
+const clickMode = () => {
+	extension_mode = extension_mode == 'race' ? 'tournament' : 'race';
+	console.log('clickMode', extension_mode)
+}
+
+
+document.addEventListener('DOMContentLoaded', function () {
+	console.log('DOMContentLoaded');
+	document.getElementById("extension-mode").addEventListener("click", clickMode);
+});
+
 const updateHorse = (data, nodes, distance) => {
 
 	cache.push(data);
@@ -123,23 +142,30 @@ const updateHorse = (data, nodes, distance) => {
 			}
 		}
 
-		//let let_open_icon = document.createElement("span");
-		//let_open_icon.className = 'racing-tag';
-		//let_open_icon.innerHTML += '<a href="https://www.stackednaks.com/horse/' + data.id + '" target="_">' + open_icon + '</a>';
-		//nodes[1].childNodes[2].appendChild(let_open_icon);
+		let count_races = document.createElement("span");
+		count_races.className = 'racing-tag naks_stats';
 
+		if (data.races_results.length >= 5) {
+			count_races.className += ' naks_warn_color';
+		} else if (data.races_results.length >= 10) {
+			count_races.className += ' naks_success_color';
+		}
+
+		count_races.innerHTML += hash_icon + '<span class="naks_mr_2">' + (data.races_results.length) + ' 12hrs</span>';
+		nodes[1].childNodes[2].appendChild(count_races);
 
 		let fire_rate = stats['all'] && stats['all'].fires ? (stats['all'].fires / (stats['all'].firsts + stats['all'].seconds + stats['all'].thirds + stats['all'].fourths + stats['all'].other) * 100) : 0;
-		win_rate = stats['all'] && stats['all'].firsts ? (stats['all'].firsts / (stats['all'].firsts + stats['all'].seconds + stats['all'].thirds + stats['all'].fourths + stats['all'].other) * 100) : 0;
+		let win_rate = stats['all'] && stats['all'].firsts ? (stats['all'].firsts / (stats['all'].firsts + stats['all'].seconds + stats['all'].thirds + stats['all'].fourths + stats['all'].other) * 100) : 0;
+		let place_rate = stats['all'] ? ((stats['all'].firsts + stats['all'].seconds + stats['all'].thirds) / (stats['all'].firsts + stats['all'].seconds + stats['all'].thirds + stats['all'].fourths + stats['all'].other) * 100) : 0;
 
 		let all_record = document.createElement("span");
 		all_record.className = 'racing-tag naks_stats';
 
-		all_record.innerHTML += '<span class="naks_mr_2">' + trophy_icon + (win_rate).toFixed(2) + '%</span>';
+		all_record.innerHTML += '<span class="naks_mr_2">' + trophy_icon + (win_rate).toFixed(0) + '%</span>';
 
 		all_record.innerHTML += ('<span class="naks_mr_2">' + flag_icon + (stats['all'].firsts + stats['all'].seconds + stats['all'].thirds + stats['all'].fourths + stats['all'].other) + '</span>');
 
-		all_record.innerHTML += ('<span>' + fire_icon + fire_rate.toFixed(2) + '%' + '</span>');
+		all_record.innerHTML += ('<span>' + fire_icon + fire_rate.toFixed(0) + '%' + '</span>');
 
 		let mh = my_horses.find(d => d.id == data.id);
 
@@ -153,6 +179,7 @@ const updateHorse = (data, nodes, distance) => {
 			if (!mh) race_stats.yellows++;
 		}
 
+
 		nodes[1].childNodes[2].appendChild(all_record);
 
 		let dis_record = document.createElement("span");
@@ -160,15 +187,16 @@ const updateHorse = (data, nodes, distance) => {
 
 		fire_rate = stats[distance].fires ? (stats[distance].fires / (stats[distance].firsts + stats[distance].seconds + stats[distance].thirds + stats[distance].fourths + stats[distance].other) * 100) : 0;
 		win_rate = stats[distance].firsts ? (stats[distance].firsts / (stats[distance].firsts + stats[distance].seconds + stats[distance].thirds + stats[distance].fourths + stats[distance].other) * 100) : 0;
+		place_rate = ((stats[distance].firsts + stats[distance].seconds + stats[distance].thirds) / (stats[distance].firsts + stats[distance].seconds + stats[distance].thirds + stats[distance].fourths + stats[distance].other) * 100);
 
-		dis_record.innerHTML += '<span class="naks_mr_2">' + trophy_icon + (win_rate).toFixed(2) + '%</span>';
+		dis_record.innerHTML += '<span class="naks_mr_2">' + trophy_icon + (win_rate).toFixed(0) + '%</span>';
 
 		dis_record.innerHTML += ('<span class="naks_mr_2">' + flag_icon + (stats[distance].firsts + stats[distance].seconds + stats[distance].thirds + stats[distance].fourths + stats[distance].other) + '</span>');
 
-		dis_record.innerHTML += ('<span class="naks_mr_2">' + fire_icon + fire_rate.toFixed(2) + '%' + '</span>');
+		dis_record.innerHTML += ('<span class="naks_mr_2">' + fire_icon + fire_rate.toFixed(0) + '%' + '</span>');
 
 		if (data.stats[distance].max_speed) {
-			dis_record.innerHTML += ('<span>' + speed_max_icon + data.stats[distance].max_speed.toFixed(2) + ' km/h</span>');
+			dis_record.innerHTML += ('<span>' + speed_max_icon + data.stats[distance].max_speed.toFixed(0) + '</span>');
 		}
 
 		let color = '';
@@ -187,7 +215,71 @@ const updateHorse = (data, nodes, distance) => {
 		if (!mh) race_stats.total++;
 		if (!mh) distance_stats.total++;
 
+		if (place_rate > 50) {
+			if (!mh) distance_stats.placers++;
+		}
+
 		nodes[1].childNodes[2].appendChild(dis_record);
+
+		if (!mh) {
+			let ranges = [1000, 1200, 1400];
+			if (distance == '1600' || distance == '1800' || distance == '2000') {
+				ranges = [1600, 1800, 2000];
+			} else if (distance == '2200' || distance == '2400' || distance == '2600') {
+				ranges = [2200, 2400, 2600];
+			}
+
+			let firsts = 0;
+			let seconds = 0;
+			let thirds = 0;
+			let fourths = 0;
+			let other = 0;
+			let fires = 0;
+			ranges.forEach(r => {
+				firsts += stats[r].firsts;
+				seconds += stats[r].seconds;
+				thirds += stats[r].thirds;
+				fourths += stats[r].fourths;
+				other += stats[r].other;
+				fires += stats[r].fires;
+			});
+
+			fire_rate = fires ? (fires / (firsts + seconds + thirds + fourths + other) * 100) : 0;
+			win_rate = firsts ? (firsts / (firsts + seconds + thirds + fourths + other) * 100) : 0;
+			place_rate = ((firsts + seconds + thirds) / (firsts + seconds + thirds + fourths + other) * 100);
+
+			if ((win_rate >= 15 || fire_rate > 60) && distance_total > 9) {
+				if (!mh) range_stats.reds++;
+			} else if ((win_rate >= 10 || fire_rate > 60)) {
+				if (!mh) range_stats.yellows++;
+			}
+			if (!mh) range_stats.total++;
+
+			if (place_rate > 50) {
+				if (!mh) range_stats.placers++;
+			}
+		}
+
+
+		let nine_twelve = 0;
+		let history_total = 0;
+		(data.stats[distance].positions || [])
+			.forEach((a) => {
+				if (a.position >= 9) nine_twelve += a.count;
+				history_total += a.count;
+			});
+
+		if (history_total > 0 && nine_twelve > 0 && nine_twelve / history_total > .50 && history_total > 8) {
+			let down_classer = document.createElement("span");
+			down_classer.className = 'racing-tag naks_stats naks_bg_success';
+
+			let down_rate = (nine_twelve / history_total * 100).toFixed(0);
+
+			down_classer.innerHTML += down_icons + '<span class="naks_mr_2"> ' + down_rate + '%</span>';
+			nodes[1].childNodes[2].appendChild(down_classer);
+
+			if (!mh) distance_stats.downers++;
+		}
 
 	}
 }
@@ -209,6 +301,16 @@ const run = () => {
 		distance_stats = {
 			reds: 0,
 			yellows: 0,
+			downers: 0,
+			placers: 0,
+			total: 0,
+		};
+
+		range_stats = {
+			reds: 0,
+			yellows: 0,
+			downers: 0,
+			placers: 0,
 			total: 0,
 		};
 
@@ -225,6 +327,16 @@ const run = () => {
 		distance_stats = {
 			reds: 0,
 			yellows: 0,
+			total: 0,
+			downers: 0,
+			placers: 0,
+		};
+
+		range_stats = {
+			reds: 0,
+			yellows: 0,
+			downers: 0,
+			placers: 0,
 			total: 0,
 		};
 
@@ -275,8 +387,7 @@ const run = () => {
 							headers: new Headers({ 'x-api-key': api_key }),
 						};
 
-						fetch('https://api.stackednaks.com/horses/' + name, options)
-							//	fetch('http://localhost:3001/horses/' + name, options)
+						fetch(host_url + '/horses/' + name, options)
 							.then(response => response.json())
 							.then(data => updateHorse(data, horse_data, selected_distance))
 							.catch(data => console.log(data));
@@ -348,8 +459,26 @@ const addHorseList = (data, list) => {
 
 		horse_div.innerHTML += ('<span class="naks_mr_2">' + fire_icon + fire_rate.toFixed(2) + '%' + '</span>');
 
+		let make_red = false;
+
+		let nine_twelve = 0;
+		let history_total = 0;
+		(data.stats[distance].positions || [])
+			.forEach((a) => {
+				if (a.position >= 9) nine_twelve += a.count;
+				history_total += a.count;
+			});
+
+		if (history_total > 0 && nine_twelve > 0 && nine_twelve / history_total > .50 && history_total > 8) {
+			let down_rate = (nine_twelve / history_total * 100).toFixed(0);
+
+			horse_div.innerHTML += ('<span class="naks_bg_danger">' + down_icons + '<span class="naks_mr_2"> ' + down_rate + '%</span>');
+			make_red = true;
+		}
+
 
 		let make_green = false;
+
 
 		if (opponent_list.length > 0) {
 
@@ -365,7 +494,7 @@ const addHorseList = (data, list) => {
 			}
 
 			if (stats[distance].max_speed != undefined) {
-				horse_div.innerHTML += ('<span class="naks_mr_2"> ' + speed_max_icon + (max_list.length + 1) + ' @ ' + data.stats[distance].max_speed.toFixed(2) + ' km/h</span>');
+				horse_div.innerHTML += ('<span class="naks_mr_2"> ' + speed_max_icon + (max_list.length + 1) + ' @ ' + data.stats[distance].max_speed.toFixed(2) + '</span>');
 			}
 
 			let med_list = opponents.filter(o => o.name != data.name && o.stats[distance] && o.stats[distance].median_speed >= data.stats[distance].median_speed);
@@ -390,9 +519,12 @@ const addHorseList = (data, list) => {
 				}
 
 			}
+
 		}
 
-		if (make_green) {
+		if (make_red) {
+			horse_div.className += ' naks_alert_color';
+		} else if (make_green) {
 			horse_div.className += ' naks_success_color';
 		}
 	}
@@ -446,7 +578,8 @@ const loadHorses = () => {
 
 					caches = global_class ? global_class : 'all';
 					let display_distance = selected_distance == 'all' ? 'All Distances' : selected_distance;
-					naks.innerHTML = 'StackedNaks - ZedRun Racer<hr style="border-top: 1px solid white;"/><span>' + class_name + ' - ' + display_distance + '</span><hr style="border-top: 1px solid white;"/>';
+
+					naks.innerHTML += 'StackedNaks - ZedRun Racer<hr style="border-top: 1px solid white;"/><span>' + class_name + ' - ' + display_distance + '</span><hr style="border-top: 1px solid white;"/>';
 					to_display.forEach(d => addHorseList(d, naks));
 
 					if (race_stats.total > 0) {
@@ -469,6 +602,11 @@ const loadHorses = () => {
 
 					if (distance_stats.total > 0) {
 
+						//let distance_type = 'Sprint';
+						//if (selected_distance == '1600')
+
+						//1000/1200/1400, Medium distance is 1600/1800/2000, Marathoner is 2200/2400/2600.
+
 						let distance_summary_div = document.createElement("div");
 						distance_summary_div.className = 'nak_list_item ';
 						distance_summary_div.innerHTML = '<hr style="border-top: 1px solid white;"/>RACE DISTANCE SUMMARY<br/>';
@@ -481,13 +619,57 @@ const loadHorses = () => {
 							distance_summary_div.innerHTML += '<span class="racing-tag naks_stats naks_warn_color naks_mr naks_mt">' + distance_stats.yellows + ' Alerts</span>';
 						}
 
-						naks.appendChild(distance_summary_div);
+						if (distance_stats.placers > 0) {
+							distance_summary_div.innerHTML += '<span class="racing-tag naks_stats naks_warn_color naks_mr naks_mt">' + distance_stats.placers + ' Placers</span>';
+						}
 
+						if (distance_stats.downers > 0) {
+							distance_summary_div.innerHTML += '<span class="racing-tag naks_stats naks_success_color naks_mr naks_mt">' + distance_stats.downers + ' Downers</span>';
+						}
+
+						naks.appendChild(distance_summary_div);
 					}
 
-					if (free_races.length > 0) {
-						let distance_summary_div = document.createElement("div");
-						distance_summary_div.className = 'nak_list_item ';
+					/*
+					if (range_stats.total > 0) {
+
+						let distance_type = 'SPRINT';
+						if (selected_distance == '1600' || selected_distance == '1800' || selected_distance == '2000') {
+							distance_type = 'MID'
+						} else if (selected_distance == '2200' || selected_distance == '2400' || selected_distance == '2600') {
+							distance_type = 'MARATHON'
+						}
+
+						let range_summary_div = document.createElement("div");
+						range_summary_div.className = 'nak_list_item ';
+						range_summary_div.innerHTML = '<hr style="border-top: 1px solid white;"/>' + distance_type + ' FUNNEL SUMMARY<br/>';
+						range_summary_div.innerHTML += '<span style="font-style: italic;">Accumulative stats for all ' + distance_type.toLocaleLowerCase() + ' distances </span><br/>';
+
+						if (range_stats.reds > 0) {
+							range_summary_div.innerHTML += '<span class="racing-tag naks_stats naks_alert_color naks_mr naks_mt">' + range_stats.reds + ' Threats</span>';
+						}
+
+						if (range_stats.yellows > 0) {
+							range_summary_div.innerHTML += '<span class="racing-tag naks_stats naks_warn_color naks_mr naks_mt">' + range_stats.yellows + ' Alerts</span>';
+						}
+
+						if (range_stats.placers > 0) {
+							range_summary_div.innerHTML += '<span class="racing-tag naks_stats naks_warn_color naks_mr naks_mt">' + range_stats.placers + ' Placers</span>';
+						}
+
+						if (range_stats.downers > 0) {
+							range_summary_div.innerHTML += '<span class="racing-tag naks_stats naks_success_color naks_mr naks_mt">' + range_stats.downers + ' Downers</span>';
+						}
+
+						naks.appendChild(range_summary_div);
+					}
+					*/
+
+					let distance_summary_div = document.createElement("div");
+					distance_summary_div.className = 'nak_list_item ';
+					distance_summary_div.innerHTML = '';
+
+					if (free_races.length > 0 && !(stable.options || {}).hide_upcoming_free) {
 						distance_summary_div.innerHTML = '<hr class="naks_mb" style="border-top: 1px solid white;"/>FREE RACES SCHEDULED<br/>';
 
 						free_races.forEach((r) => {
@@ -505,7 +687,7 @@ const loadHorses = () => {
 							if (r.details.class == 0) class_display += 'G';
 
 							class_display += '</span>';
-
+						
 							if (r.count_down < 0) {
 								let max_mins = 1;
 								let max_secs = 1;
@@ -556,7 +738,7 @@ const loadHorses = () => {
 									max_secs = 50;
 								}
 
-
+								
 								if (r.count_down > -120) {
 									if (mins > 0) {
 										distance_summary_div.innerHTML += (class_display + ' @ ' + r.details.length + 'm running for ' + mins + 'm ' + secs + 's (max ' + max_mins + 'm ' + max_secs + 's)<br/>')
@@ -574,11 +756,15 @@ const loadHorses = () => {
 								}
 
 							}
-						})
 
-						distance_summary_div.innerHTML += '<br/>Have you donated recently?<br/>ETH: 0x8aaf62f371fa1edadbeadab290905369a8f1a174<br/>Support: <a href="mailto:hello@stackednaks.com" target="_">hello@stackednaks.com</a>';
-						naks.appendChild(distance_summary_div);
+							
+						})
 					}
+
+					distance_summary_div.innerHTML += '<br/>Have you donated recently?<br/>ETH: 0x8aaf62f371fa1edadbeadab290905369a8f1a174<br/>Support: <a href="mailto:hello@stackednaks.com" target="_">hello@stackednaks.com</a>';
+
+					naks.appendChild(distance_summary_div);
+
 
 					return;
 				}
@@ -606,8 +792,7 @@ const loadHorses = () => {
 						headers: new Headers({ 'x-api-key': api_key }),
 					};
 
-					fetch('https://api.stackednaks.com/horses?stable_id=' + api_key + '&classes=&sort=name&distance=all', options)
-						//	fetch('http://localhost:3001/horses?stable_id=' + api_key + '&classes=&sort=name&distance=all' + name, options)
+					fetch(host_url + '/horses?stable_id=' + api_key + '&classes=&sort=win_rate&distance=all', options)
 						.then(response => response.json())
 						.then(data => {
 							data.results.forEach(d => my_horses.push(d));
@@ -619,6 +804,17 @@ const loadHorses = () => {
 			}
 		}
 	}
+}
+
+const loadStable = () => {
+	const options = {
+		headers: new Headers({ 'x-api-key': api_key }),
+	};
+
+	fetch(host_url + '/stables/' + api_key, options).then(response => response.json())
+		.then(data => {
+			stable = data;
+		});
 }
 
 //find the public key of from within the webpage
@@ -640,6 +836,8 @@ const initHeader = () => {
 		for (var i = 0, max = links.length; i < max; i++) {
 			if (links[i].href.indexOf('https://etherscan.io') > -1) {
 				api_key = links[i].href.split('/').pop();
+				loadStable();
+				fatigue();
 			}
 		}
 	}
@@ -647,13 +845,15 @@ const initHeader = () => {
 
 //load free races from stackednaks
 const freeRaces = () => {
-	if (api_key) {
+
+	
+	if (api_key && !(stable.options || {}).hide_upcoming_free) {
+
 		const options = {
 			headers: new Headers({ 'x-api-key': api_key }),
 		};
 
-		fetch('https://api.stackednaks.com/races?fee=0', options)
-			//fetch('http://localhost:3001/races?fee=0', options)
+		fetch(host_url + '/races?fee=0', options)
 			.then(response => response.json())
 			.then(data => {
 				free_races = [];
@@ -677,7 +877,21 @@ const fatigue = async () => {
 		const options = {
 			headers: new Headers({ 'authorization': 'Bearer ' + token }),
 		};
-		
+
+		my_horses.forEach(async mh => {
+
+			let stamina = await fetch('https://api.zed.run/api/v1/horses/stamina/' + mh.id, options).then(response => response.json())
+				.catch(err => console.log(err));
+
+			//console.log(mh, stamina)
+
+			if (stamina) {
+				mh.fatigue = stamina.current_stamina;
+				mh.time_to_full_recovery = stamina.time_to_full_recovery;
+			}
+
+		});
+
 		let class_1 = await fetch('https://api.zed.run/api/v1/races/paid/available_race_horses?public_address=' + api_key + '&offset=0&horse_name=&race_class=1', options).then(response => response.json());
 		let class_2 = await fetch('https://api.zed.run/api/v1/races/paid/available_race_horses?public_address=' + api_key + '&offset=0&horse_name=&race_class=2', options).then(response => response.json());
 		let class_3 = await fetch('https://api.zed.run/api/v1/races/paid/available_race_horses?public_address=' + api_key + '&offset=0&horse_name=&race_class=3', options).then(response => response.json());
@@ -690,23 +904,21 @@ const fatigue = async () => {
 		data.forEach(h => {
 			let mh = my_horses.find(m => m.id == h.horse_id);
 			if (mh) {
-				mh.fatigue = 100 - h.current_fatigue;
-
 				mh.details.class = h.class;
 				mh.details.rating = h.rating;
 			} else {
-				console.log(h.hash_info.name, h.current_fatigue);
+				//console.log(h);
 			}
 		});
+
 
 		my_horses.forEach(h => {
 			h.is_racing = data.find(m => h.id == m.horse_id) == undefined;
 		});
 
-		my_horses.sort((a, b) => {
-			return b.fatigue - a.fatigue;
-		})
-
+		//my_horses.sort((a, b) => {
+		//	return b.fatigue - a.fatigue;
+		//})				
 	}
 }
 
@@ -838,8 +1050,6 @@ const horseDetails = () => {
 }
 
 
-fatigue();
-
 setInterval(() => {
 	initHeader();
 	loadHorses();
@@ -854,7 +1064,7 @@ setInterval(() => {
 
 setInterval(() => {
 	fatigue();
-}, 10000);
+}, 60000);
 
 setInterval(() => {
 	freeRaces();
