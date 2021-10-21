@@ -761,7 +761,7 @@ const loadHorses = () => {
 						})
 					}
 
-					distance_summary_div.innerHTML += '<br/>Have you donated recently?<br/>ETH: 0x8aaf62f371fa1edadbeadab290905369a8f1a174<br/>Support: <a href="mailto:hello@stackednaks.com" target="_">hello@stackednaks.com</a>';
+					distance_summary_div.innerHTML += '<br/>Have you donated recently?<br/>ETH: 0xc3422b8D7aa4be58C2BA7F07342620D5e13C2cD3<br/>Support: <a href="mailto:hello@stackednaks.com" target="_">hello@stackednaks.com</a>';
 
 					naks.appendChild(distance_summary_div);
 
