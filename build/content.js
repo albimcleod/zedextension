@@ -146,12 +146,12 @@ const updateHorse = (data, nodes, distance) => {
 		count_races.className = 'racing-tag naks_stats';
 
 		if (data.races_results.length >= 5) {
-			count_races.className += ' naks_warn_color';
+			count_races.className += ' naks_mod_color';
 		} else if (data.races_results.length >= 10) {
 			count_races.className += ' naks_success_color';
 		}
 
-		count_races.innerHTML += hash_icon + '<span class="naks_mr_2">' + (data.races_results.length) + ' 12hrs</span>';
+		count_races.innerHTML += hash_icon + '<span class="naks_mr_2">' + (data.races_results.length) + '</span>';
 		nodes[1].childNodes[2].appendChild(count_races);
 
 		let fire_rate = stats['all'] && stats['all'].fires ? (stats['all'].fires / (stats['all'].firsts + stats['all'].seconds + stats['all'].thirds + stats['all'].fourths + stats['all'].other) * 100) : 0;
@@ -171,13 +171,34 @@ const updateHorse = (data, nodes, distance) => {
 
 		let all_total = (stats['all'].firsts + stats['all'].seconds + stats['all'].thirds + stats['all'].fourths + stats['all'].other);
 
-		if ((win_rate > 15 || fire_rate > 60) && all_total > 9) {
+		if(
+			(win_rate>=15 && all_total>=50 && fire_rate>=0) ||
+			(win_rate>=15 && all_total>=10 && fire_rate>=40) ||
+			(win_rate>=0 && all_total>=0 && fire_rate>=85)
+		) {
 			all_record.className += ' naks_alert_color';
 			if (!mh) race_stats.reds++;
-		} else if ((win_rate >= 10 || fire_rate > 60)) {
+		}else if(
+			(win_rate>=12 && all_total>=50 && fire_rate>=0) ||
+			(win_rate>=12 && all_total>=10 && fire_rate>=40) ||
+			(win_rate>=12 && all_total>=0 && fire_rate>=65)
+		){
 			all_record.className += ' naks_warn_color';
 			if (!mh) race_stats.yellows++;
+		}else if(
+			(win_rate<=8 && all_total>=50 && fire_rate<=25)
+		){
+			all_record.className += ' naks_mod_color'
+			if (!mh) race_stats.blues++;
 		}
+
+		// if ((win_rate > 15 || fire_rate > 60) && all_total > 9) {
+		// 	all_record.className += ' naks_alert_color';
+		// 	if (!mh) race_stats.reds++;
+		// } else if ((win_rate >= 10 || fire_rate > 60)) {
+		// 	all_record.className += ' naks_warn_color';
+		// 	if (!mh) race_stats.yellows++;
+		// }
 
 
 		nodes[1].childNodes[2].appendChild(all_record);
@@ -203,15 +224,41 @@ const updateHorse = (data, nodes, distance) => {
 
 		let distance_total = (stats[distance].firsts + stats[distance].seconds + stats[distance].thirds + stats[distance].fourths + stats[distance].other);
 
-		if ((win_rate >= 15 || fire_rate > 60) && distance_total > 9) {
-			dis_record.className += ' naks_alert_color';
-			color = 'naks_alert_color';
+
+		if(
+			(win_rate>=15 && distance_total>=50 && fire_rate>=0) ||
+			(win_rate>=15 && distance_total>=10 && fire_rate>=40) ||
+			(win_rate>=0 && distance_total>=0 && fire_rate>=85)
+		){  
+			dis_record.className += color = ' naks_alert_color';
 			if (!mh) distance_stats.reds++;
-		} else if ((win_rate >= 10 || fire_rate > 60)) {
-			dis_record.className += ' naks_warn_color';
-			color = 'naks_warn_color';
+		}else if(
+			(win_rate>=12 && distance_total>=50 && fire_rate>=0) ||
+			(win_rate>=12 && distance_total>=10 && fire_rate>=40) ||
+			(win_rate>=12 && distance_total>=0 && fire_rate>=65)
+		){  
+			dis_record.className += color = ' naks_warn_color';
 			if (!mh) distance_stats.yellows++;
+		}else if(
+			(win_rate<=8 && distance_total>=50 && fire_rate<=25)
+		){ 
+			dis_record.className += color = ' naks_mod_color'
+			if (!mh) distance_stats.blues++;
 		}
+
+		// if ((win_rate >= 15 || fire_rate > 60) && distance_total > 9) {
+		// 	dis_record.className += ' naks_alert_color';
+		// 	color = 'naks_alert_color';
+		// 	if (!mh) distance_stats.reds++;
+		// } else if ((win_rate >= 10 || fire_rate > 60)) {
+		// 	dis_record.className += ' naks_warn_color';
+		// 	color = 'naks_warn_color';
+		// 	if (!mh) distance_stats.yellows++;
+		// }
+
+		// if (!mh && color == 'naks_red_color') distance_stats.reds++;
+		// if (!mh && color == 'naks_warn_color') distance_stats.yellows++;
+		// if (!mh && color == 'naks_mod_color') distance_stats.blues++;
 		if (!mh) race_stats.total++;
 		if (!mh) distance_stats.total++;
 
@@ -400,10 +447,16 @@ const run = () => {
 
 }
 
-const addHorseList = (data, list) => {
+const trim_name = (name,l=12)=>{
+	if(!name) return "-";
+	if(name && name.length<=l) return name;
+	else return `${name.slice(0,l)}...`
+}
 
+const addHorseList = (data, list, show) => {
+	if(show==false) return;
 	let horse_div = document.createElement("div");
-	horse_div.className = 'nak_list_item ';
+	horse_div.className = 'nak_list_item row-flex';
 
 	let tags = ((data.options || {}).tags || []);
 
@@ -411,7 +464,7 @@ const addHorseList = (data, list) => {
 	if (hide) return;
 
 
-	horse_div.innerHTML = data.name + ' (' + data.details.rating + ')';
+	horse_div.innerHTML = trim_name(data.name) + ' (' + data.details.rating + ')';
 
 	if (data.fatigue > 0) {
 		horse_div.innerHTML += (' (' + Number(data.fatigue) + ') ');
@@ -428,7 +481,8 @@ const addHorseList = (data, list) => {
 	}
 
 
-	horse_div.innerHTML += '<br/>'
+	// horse_div.innerHTML += '<br/>'
+	horse_div.innerHTML += '<div class="flex-grow" ></div>'
 
 	let distance = selected_distance ? selected_distance : 'all';
 
@@ -453,11 +507,14 @@ const addHorseList = (data, list) => {
 		let fire_rate = stats[distance] && stats[distance].fires ? (stats[distance].fires / total * 100) : 0;
 		let win_rate = stats[distance] && stats[distance].firsts ? (stats[distance].firsts / total * 100) : 0;
 
-		horse_div.innerHTML += '<span class="naks_mr_2">' + trophy_icon + (win_rate).toFixed(2) + '%</span>';
-
-		horse_div.innerHTML += ('<span class="naks_mr_2">' + flag_icon + total + '</span>');
-
-		horse_div.innerHTML += ('<span class="naks_mr_2">' + fire_icon + fire_rate.toFixed(2) + '%' + '</span>');
+		// horse_div.innerHTML += '<span class="naks_mr_2">' + trophy_icon + (win_rate).toFixed(0) + '%</span>';
+		horse_div.innerHTML += `<div class="naks_mr_2 col-flex"> <span>${trophy_icon}</span>  <span>${(win_rate).toFixed(0)}%</span> </div>`;
+		
+		// horse_div.innerHTML += ('<span class="naks_mr_2">' + flag_icon + total + '</span>');
+		horse_div.innerHTML += `<div class="naks_mr_2 col-flex"> <span>${flag_icon}</span>  <span>${(total).toFixed(0)}%</span> </div>`;
+		
+		// horse_div.innerHTML += ('<span class="naks_mr_2">' + fire_icon + fire_rate.toFixed(0) + '%' + '</span>');
+		horse_div.innerHTML += `<div class="naks_mr_2 col-flex"> <span>${fire_icon}</span>  <span>${(fire_rate).toFixed(0)}%</span> </div>`;
 
 		let make_red = false;
 
@@ -472,8 +529,11 @@ const addHorseList = (data, list) => {
 		if (history_total > 0 && nine_twelve > 0 && nine_twelve / history_total > .50 && history_total > 8) {
 			let down_rate = (nine_twelve / history_total * 100).toFixed(0);
 
-			horse_div.innerHTML += ('<span class="naks_bg_danger">' + down_icons + '<span class="naks_mr_2"> ' + down_rate + '%</span>');
+			// horse_div.innerHTML += ('<span class="naks_bg_danger">' + down_icons + '<span class="naks_mr_2"> ' + down_rate + '%</span>');
+			horse_div.innerHTML += `<div class="naks_bg_danger col-flex"> <span>${down_icons}</span>  <span>${(down_rate)}%</span> </div>`;
 			make_red = true;
+		}else{
+			horse_div.innerHTML += `<div style="min-height:10px; min-width:20px;" ></div>`;
 		}
 
 
@@ -494,13 +554,18 @@ const addHorseList = (data, list) => {
 			}
 
 			if (stats[distance].max_speed != undefined) {
-				horse_div.innerHTML += ('<span class="naks_mr_2"> ' + speed_max_icon + (max_list.length + 1) + ' @ ' + data.stats[distance].max_speed.toFixed(2) + '</span>');
+				// horse_div.innerHTML += ('<span class="naks_mr_2"> ' + speed_max_icon + (max_list.length + 1) + ' @ ' + data.stats[distance].max_speed.toFixed(2) + '</span>');
+				horse_div.innerHTML += `<div class="naks_mr_2 col-flex"> <span>${speed_max_icon}</span>  <span>${(max_list.length + 1)}</span></div>`;
+				horse_div.innerHTML += `<div class="naks_mr_2 col-flex"> <span>${"@"}</span>  <span>${data.stats[distance].max_speed.toFixed(2)}</span> </div>`;
+
 			}
 
 			let med_list = opponents.filter(o => o.name != data.name && o.stats[distance] && o.stats[distance].median_speed >= data.stats[distance].median_speed);
 
 			if (stats[distance].median_speed != undefined) {
-				horse_div.innerHTML += ('<span class="naks_mr_2"> ' + speed_med_icon + (med_list.length + 1) + '</span>');
+				// horse_div.innerHTML += ('<span class="naks_mr_2"> ' + speed_med_icon + (med_list.length + 1) + '</span>');
+				horse_div.innerHTML += `<div class="naks_mr_2 col-flex"> <span>${speed_med_icon}</span>  <span>${med_list.length + 1}</span> </div>`;
+
 			}
 
 			//only 1 threat
@@ -514,7 +579,8 @@ const addHorseList = (data, list) => {
 				});
 
 				if (enemies.length > 0) {
-					horse_div.innerHTML += ('<span class="naks_mr_2"> ' + warning_icon + enemies.length + '</span>');
+					// horse_div.innerHTML += ('<span class="naks_mr_2"> ' + warning_icon + enemies.length + '</span>');
+					horse_div.innerHTML += `<div class="naks_mr_2 col-flex"> <span>${warning_icon}</span>  <span>${enemies.length}</span> </div>`;
 					make_green = false;
 				}
 
@@ -579,8 +645,11 @@ const loadHorses = () => {
 					caches = global_class ? global_class : 'all';
 					let display_distance = selected_distance == 'all' ? 'All Distances' : selected_distance;
 
-					naks.innerHTML += 'StackedNaks - ZedRun Racer<hr style="border-top: 1px solid white;"/><span>' + class_name + ' - ' + display_distance + '</span><hr style="border-top: 1px solid white;"/>';
-					to_display.forEach(d => addHorseList(d, naks));
+					naks.innerHTML += `Don't ZED Blind. <span class="red-text">Blood Tool</span> -contact danshan11`
+					naks.innerHTML += '<hr style="border-top: 1px solid white;"/><span>' + class_name + ' - ' + display_distance + '</span><hr style="border-top: 1px solid white;"/>';
+					// naks.innerHTML += 'StackedNaks - ZedRun Racer<hr style="border-top: 1px solid white;"/><span>' + class_name + ' - ' + display_distance + '</span><hr style="border-top: 1px solid white;"/>';
+					let hids = to_display.map(e=>e.id)
+					to_display.forEach(d => addHorseList(d, naks, !d.is_racing));
 
 					if (race_stats.total > 0) {
 
@@ -762,7 +831,7 @@ const loadHorses = () => {
 					}
 
 					// distance_summary_div.innerHTML += '<br/>Have you donated recently?<br/>ETH: 0xc3422b8D7aa4be58C2BA7F07342620D5e13C2cD3<br/>Support: <a href="mailto:hello@stackednaks.com" target="_">hello@stackednaks.com</a>';
-					distance_summary_div.innerHTML += '<br/>Support: <a href="mailto:hello@stackednaks.com" target="_">hello@stackednaks.com</a>';
+					distance_summary_div.innerHTML += '<br/>Support: <span class="naks_success_text">Discord Danshan11</span>';
 
 					naks.appendChild(distance_summary_div);
 

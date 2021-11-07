@@ -1,127 +1,161 @@
 .naks_header {
-    color: white;
-    text-align: center;
-    padding-top: 10px;
-	padding-bottom: 10px;
+  color: white;
+  text-align: center;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 .naks_icon {
-	margin-right: 10px;
+  margin-right: 10px;
 }
 
 .naks_stats {
-	border: 1px solid white;
-    padding: 3px;	
-	font-size: 1.1rem!important;
+  border: 1px solid white;
+  padding: 3px;
+  font-size: 1.1rem !important;
 }
 
 .naks_alert_color {
-   background: red !important;
+  background: red !important;
+}
+.red-text {
+  color: red !important;
+}
+.naks_warn_color {
+  background-color: #ffc107 !important;
+  color: black !important;
 }
 
-.naks_warn_color {
-	background-color: #ffc107!important;
-    color: black!important;
+.naks_mod_color {
+  background-color: #4596e6 !important;
+  color: white !important;
 }
 
 .naks_success_color {
-	background-color: #27b18a!important;    
+  background-color: #27b18a !important;
+  color: white !important;
 }
 
+.naks_success_text {
+  color: #27b18a !important;
+}
+
+.naks_fire_color {
+  background-color: #ff5534 !important;
+  color: white !important;
+}
 
 .naks_mr {
-	margin-right: .8rem;
+  margin-right: 0.8rem;
 }
 
 .naks_mr_2 {
-	margin-right: .2rem;
+  margin-right: 0.2rem;
 }
 
 .naks_mt {
-	margin-top: .8rem;
+  margin-top: 0.8rem;
 }
 
 .naks_mb {
-	margin-bottom: .8rem;
+  margin-bottom: 0.8rem;
 }
 
 .naks_pill {
-    min-width: 2rem;
+  min-width: 2rem;
 }
-
 
 .nak_list {
-	color: white;
-    position: fixed;
-    right: 20px;
-    /*border: 1px solid white;*/
-    width: 20%;
-    padding: 5px;
-	font-size: 1.2rem;
-	border-radius: 7px;
-    background-color: #3b4047;
-	margin-top: 5px;
-	z-index: 1000;
-	top: 115px;
+  color: white;
+  position: fixed;
+  right: 20px;
+  /*border: 1px solid white;*/
+  width: 22%;
+  padding: 5px;
+  font-size: 1.2rem;
+  border-radius: 7px;
+  /* background-color: #274343; */
+  background-image: linear-gradient(135deg, rgb(16, 75, 55), rgba(42, 46, 53));
+  margin-top: 5px;
+  z-index: 1000;
+  top: 115px;
 }
 
-.nak_list_item { 
-	padding: 3px;
-	margin-bottom: 2px;
-	border-radius: 2px;
+.nak_list_item {
+  padding: 3px;
+  margin-bottom: 2px;
+  border-radius: 2px;
 }
 
 .naks_w_85 {
-	width: 85%;
+  width: 85%;
 }
 
 .d-none {
-	display: none;
+  display: none;
 }
 
 .buy-in-content .race-horse-list .racehorse {
-    width: 80%!important;
+  width: 80% !important;
 }
 
-
 .naks_badge {
-    display: inline-block;
-    padding: .35em .65em;
-    font-size: .75em;
-    font-weight: 700;
-    line-height: 1;
-    color: #fff;
-    text-align: center;
-    white-space: nowrap;
-    vertical-align: baseline;
-    border-radius: .25rem;
+  display: inline-block;
+  padding: 0.35em 0.65em;
+  font-size: 0.75em;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: 0.25rem;
 }
 
 .naks_bg_info {
-    background-color: #0dcaf0!important;
-    color: black!important;
-    font-size: 1.1rem!important;
+  background-color: #0dcaf0 !important;
+  color: black !important;
+  font-size: 1.1rem !important;
 }
 
 .naks_bg_success {
-    background-color: #27b18a!important;
-    color: black!important;
-    font-size: 1.1rem!important;
+  background-color: #27b18a !important;
+  color: white !important;
+  font-size: 1.1rem !important;
 }
 
 .naks_distance_stats {
-    text-align: left;
-    display: flex !important;
-    width: 100%;
-    border: 1px solid white;
-    padding: 3px;	
-    font-size: 1.5rem!important;
+  text-align: left;
+  display: flex !important;
+  width: 100%;
+  border: 1px solid white;
+  padding: 3px;
+  font-size: 1.5rem !important;
 }
 
 .w_25 {
-    width: 25%
+  width: 25%;
 }
 
 .naks_highlight_row {
-    background-color: rgb(39, 177, 138);;
+  background-color: rgb(39, 177, 138);
+}
+
+.row-flex {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+.col-flex {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.flex-grow {
+  flex-grow: 1;
+}
+.m-auto {
+  margin: 0 auto;
 }
