@@ -511,7 +511,7 @@ const addHorseList = (data, list, show) => {
 		horse_div.innerHTML += `<div class="naks_mr_2 col-flex"> <span>${trophy_icon}</span>  <span>${(win_rate).toFixed(0)}%</span> </div>`;
 		
 		// horse_div.innerHTML += ('<span class="naks_mr_2">' + flag_icon + total + '</span>');
-		horse_div.innerHTML += `<div class="naks_mr_2 col-flex"> <span>${flag_icon}</span>  <span>${(total).toFixed(0)}%</span> </div>`;
+		horse_div.innerHTML += `<div class="naks_mr_2 col-flex"> <span>${flag_icon}</span>  <span>${(total).toFixed(0)}</span> </div>`;
 		
 		// horse_div.innerHTML += ('<span class="naks_mr_2">' + fire_icon + fire_rate.toFixed(0) + '%' + '</span>');
 		horse_div.innerHTML += `<div class="naks_mr_2 col-flex"> <span>${fire_icon}</span>  <span>${(fire_rate).toFixed(0)}%</span> </div>`;
