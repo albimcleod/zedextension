@@ -962,14 +962,16 @@ const fatigue = async () => {
 
 		});
 
-		let class_1 = await fetch('https://api.zed.run/api/v1/races/paid/available_race_horses?public_address=' + api_key + '&offset=0&horse_name=&race_class=1', options).then(response => response.json());
-		let class_2 = await fetch('https://api.zed.run/api/v1/races/paid/available_race_horses?public_address=' + api_key + '&offset=0&horse_name=&race_class=2', options).then(response => response.json());
-		let class_3 = await fetch('https://api.zed.run/api/v1/races/paid/available_race_horses?public_address=' + api_key + '&offset=0&horse_name=&race_class=3', options).then(response => response.json());
-		let class_4 = await fetch('https://api.zed.run/api/v1/races/paid/available_race_horses?public_address=' + api_key + '&offset=0&horse_name=&race_class=4', options).then(response => response.json());
-		let class_5 = await fetch('https://api.zed.run/api/v1/races/paid/available_race_horses?public_address=' + api_key + '&offset=0&horse_name=&race_class=5', options).then(response => response.json());
-		let class_0 = await fetch('https://api.zed.run/api/v1/races/paid/available_race_horses?public_address=' + api_key + '&offset=0&horse_name=&race_class=0', options).then(response => response.json());
+		// let class_1 = await fetch('https://api.zed.run/api/v1/races/paid/available_race_horses?public_address=' + api_key + '&offset=0&horse_name=&race_class=1', options).then(response => response.json());
+		// let class_2 = await fetch('https://api.zed.run/api/v1/races/paid/available_race_horses?public_address=' + api_key + '&offset=0&horse_name=&race_class=2', options).then(response => response.json());
+		// let class_3 = await fetch('https://api.zed.run/api/v1/races/paid/available_race_horses?public_address=' + api_key + '&offset=0&horse_name=&race_class=3', options).then(response => response.json());
+		// let class_4 = await fetch('https://api.zed.run/api/v1/races/paid/available_race_horses?public_address=' + api_key + '&offset=0&horse_name=&race_class=4', options).then(response => response.json());
+		// let class_5 = await fetch('https://api.zed.run/api/v1/races/paid/available_race_horses?public_address=' + api_key + '&offset=0&horse_name=&race_class=5', options).then(response => response.json());
+		// let class_0 = await fetch('https://api.zed.run/api/v1/races/paid/available_race_horses?public_address=' + api_key + '&offset=0&horse_name=&race_class=0', options).then(response => response.json());
 
-		let data = class_0.concat(class_1).concat(class_2).concat(class_3).concat(class_4).concat(class_5);
+		// let data = class_0.concat(class_1).concat(class_2).concat(class_3).concat(class_4).concat(class_5);
+
+		let data = await get_free_horses({stable_id:api_key, token});
 
 		data.forEach(h => {
 			let mh = my_horses.find(m => m.id == h.horse_id);
@@ -981,10 +983,11 @@ const fatigue = async () => {
 			}
 		});
 
-
 		my_horses.forEach(h => {
 			h.is_racing = data.find(m => h.id == m.horse_id) == undefined;
 		});
+
+		console.table(my_horses.map(({is_racing, id})=>({id, is_racing,})))
 
 		//my_horses.sort((a, b) => {
 		//	return b.fatigue - a.fatigue;
@@ -1120,6 +1123,21 @@ const horseDetails = () => {
 }
 
 
+const get_free_horses = async ({stable_id, token, offset=0})=>{
+	const options = {
+		headers: new Headers({ 'authorization': 'Bearer ' + token }),
+	};
+	let ar = [], temp=[]
+	do{
+		let api = `https://api.zed.run/api/v1/races/paid/available_race_horses?public_address=${stable_id}&offset=${offset}`
+		console.log(offset, api)
+		temp = (await fetch(api, options).then(r=>r.json())) || [];
+		ar = [...ar, ...temp]
+		offset+=10
+	}while(temp && temp.length>0)
+	return ar;
+}
+
 setInterval(() => {
 	initHeader();
 	loadHorses();
@@ -1132,6 +1150,7 @@ setInterval(() => {
 
 }, 1000);
 
+setTimeout(fatigue,5000)
 setInterval(() => {
 	fatigue();
 }, 60000);
