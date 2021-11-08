@@ -549,7 +549,7 @@ const addHorseList = (data, list, show) => {
 			let max_list = opponents.filter(o => o.name != data.name && o.stats[distance] && o.stats[distance].max_speed >= data.stats[distance].max_speed);
 
 			//is horse top 3
-			if ((max_list.length + 1) <= 3 && stats[distance].stdev != undefined) {
+			if ((max_list.length + 1)>=3 && (max_list.length + 1) <= 4 && stats[distance].stdev != undefined) {
 				make_green = true;
 			}
 
