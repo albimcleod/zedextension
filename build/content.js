@@ -454,7 +454,7 @@ const trim_name = (name,l=12)=>{
 }
 
 const addHorseList = (data, list, show) => {
-	if(show==false) return;
+	if(show===false) return;
 	let horse_div = document.createElement("div");
 	horse_div.className = 'nak_list_item row-flex';
 
@@ -649,7 +649,7 @@ const loadHorses = () => {
 					naks.innerHTML += '<hr style="border-top: 1px solid white;"/><span>' + class_name + ' - ' + display_distance + '</span><hr style="border-top: 1px solid white;"/>';
 					// naks.innerHTML += 'StackedNaks - ZedRun Racer<hr style="border-top: 1px solid white;"/><span>' + class_name + ' - ' + display_distance + '</span><hr style="border-top: 1px solid white;"/>';
 					let hids = to_display.map(e=>e.id)
-					to_display.forEach(d => addHorseList(d, naks, !d.is_racing));
+					to_display.forEach(d => addHorseList(d, naks, !(d?.is_racing===true)));
 
 					if (race_stats.total > 0) {
 
@@ -1150,10 +1150,10 @@ setInterval(() => {
 
 }, 1000);
 
-setTimeout(fatigue,5000)
+setTimeout(fatigue,10000)
 setInterval(() => {
 	fatigue();
-}, 60000);
+}, 30000);
 
 setInterval(() => {
 	freeRaces();
