@@ -453,8 +453,8 @@ const trim_name = (name,l=12)=>{
 	else return `${name.slice(0,l)}...`
 }
 
-const addHorseList = (data, list, show) => {
-	if(show===false) return;
+const addHorseList = (data, list, show=true) => {
+	// if(show===false) return;
 	let horse_div = document.createElement("div");
 	horse_div.className = 'nak_list_item row-flex';
 
@@ -649,7 +649,8 @@ const loadHorses = () => {
 					naks.innerHTML += '<hr style="border-top: 1px solid white;"/><span>' + class_name + ' - ' + display_distance + '</span><hr style="border-top: 1px solid white;"/>';
 					// naks.innerHTML += 'StackedNaks - ZedRun Racer<hr style="border-top: 1px solid white;"/><span>' + class_name + ' - ' + display_distance + '</span><hr style="border-top: 1px solid white;"/>';
 					let hids = to_display.map(e=>e.id)
-					to_display.forEach(d => addHorseList(d, naks, !(d?.is_racing===true)));
+					// to_display.forEach(d => addHorseList(d, naks, !(d?.is_racing===true)));
+					to_display.forEach(d => addHorseList(d, naks));
 
 					if (race_stats.total > 0) {
 
