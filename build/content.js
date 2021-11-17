@@ -549,7 +549,7 @@ const addHorseList = (data, list, show=true) => {
 			let max_list = opponents.filter(o => o.name != data.name && o.stats[distance] && o.stats[distance].max_speed >= data.stats[distance].max_speed);
 
 			//is horse top 3
-			if ((max_list.length + 1)>=3 && (max_list.length + 1) <= 4 && stats[distance].stdev != undefined) {
+			if ((max_list.length + 1) <= 4 && stats[distance].stdev != undefined) {
 				make_green = true;
 			}
 
@@ -905,11 +905,17 @@ const initHeader = () => {
 
 		var links = document.getElementsByTagName("a");
 		for (var i = 0, max = links.length; i < max; i++) {
-			if (links[i].href.indexOf('https://etherscan.io') > -1) {
-				api_key = links[i].href.split('/').pop();
+			if (links[i].href.indexOf('https://explorer-mainnet.maticvigil.com/address/') > -1) {				
+				api_key = links[i].href.split('/')[4];
+				// console.log(api_key)
 				loadStable();
 				fatigue();
 			}
+			// if (links[i].href.indexOf('https://etherscan.io') > -1) {
+			// 	api_key = links[i].href.split('/').pop();
+			// 	loadStable();
+			// 	fatigue();
+			// }
 		}
 	}
 }
