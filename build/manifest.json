@@ -2,7 +2,7 @@
   "name": "StackedNaks - ZedRun",
   "action": {},
   "manifest_version": 3,
-  "version": "1.42",
+  "version": "1.43",
   "description": "Manage your racing stable from within ZedRun to improve your race results",
   "permissions": [
       
