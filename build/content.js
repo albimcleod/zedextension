@@ -130,7 +130,7 @@ const updateHorse = (data, nodes, distance) => {
 		if (!stats) return;
 
 		let class_stats = false;
-
+		console.log({global_class})
 		if (global_class && global_class != 'all' && data.classes) {
 			stats = data.classes[global_class];
 
@@ -151,8 +151,8 @@ const updateHorse = (data, nodes, distance) => {
 			count_races.className += ' naks_success_color';
 		}
 
-		count_races.innerHTML += hash_icon + '<span class="naks_mr_2">' + (data.races_results.length) + '</span>';
-		nodes[1].childNodes[2].appendChild(count_races);
+		// count_races.innerHTML += hash_icon + '<span class="naks_mr_2">' + (data.races_results.length) + '</span>';
+		// nodes[1].childNodes[2].appendChild(count_races);
 
 		let fire_rate = stats['all'] && stats['all'].fires ? (stats['all'].fires / (stats['all'].firsts + stats['all'].seconds + stats['all'].thirds + stats['all'].fourths + stats['all'].other) * 100) : 0;
 		let win_rate = stats['all'] && stats['all'].firsts ? (stats['all'].firsts / (stats['all'].firsts + stats['all'].seconds + stats['all'].thirds + stats['all'].fourths + stats['all'].other) * 100) : 0;
@@ -172,21 +172,23 @@ const updateHorse = (data, nodes, distance) => {
 		let all_total = (stats['all'].firsts + stats['all'].seconds + stats['all'].thirds + stats['all'].fourths + stats['all'].other);
 
 		if(
-			(win_rate>=15 && all_total>=50 && fire_rate>=0) ||
+			(win_rate>=15 && all_total>=25 && fire_rate>=0) ||
 			(win_rate>=15 && all_total>=10 && fire_rate>=40) ||
+			(win_rate>=40 && all_total>=5 && fire_rate>=0) ||
 			(win_rate>=0 && all_total>=0 && fire_rate>=85)
 		) {
 			all_record.className += ' naks_alert_color';
 			if (!mh) race_stats.reds++;
 		}else if(
-			(win_rate>=12 && all_total>=50 && fire_rate>=0) ||
+			(win_rate>=12 && all_total>=25 && fire_rate>=0) ||
 			(win_rate>=12 && all_total>=10 && fire_rate>=40) ||
-			(win_rate>=12 && all_total>=0 && fire_rate>=65)
+			(win_rate>=20 && all_total>=5 && fire_rate>=0) ||
+			(win_rate>=12 && all_total>=0 && fire_rate>=70)
 		){
 			all_record.className += ' naks_warn_color';
 			if (!mh) race_stats.yellows++;
 		}else if(
-			(win_rate<=8 && all_total>=50 && fire_rate<=25)
+			(win_rate<=10 && all_total>=0 && fire_rate<=40)
 		){
 			all_record.className += ' naks_mod_color'
 			if (!mh) race_stats.blues++;
@@ -205,6 +207,8 @@ const updateHorse = (data, nodes, distance) => {
 
 		let dis_record = document.createElement("span");
 		dis_record.className = 'racing-tag naks_stats';
+		if(!class_stats)
+			dis_record.className += ' naks_stats_border';
 
 		fire_rate = stats[distance].fires ? (stats[distance].fires / (stats[distance].firsts + stats[distance].seconds + stats[distance].thirds + stats[distance].fourths + stats[distance].other) * 100) : 0;
 		win_rate = stats[distance].firsts ? (stats[distance].firsts / (stats[distance].firsts + stats[distance].seconds + stats[distance].thirds + stats[distance].fourths + stats[distance].other) * 100) : 0;
@@ -215,10 +219,16 @@ const updateHorse = (data, nodes, distance) => {
 		dis_record.innerHTML += ('<span class="naks_mr_2">' + flag_icon + (stats[distance].firsts + stats[distance].seconds + stats[distance].thirds + stats[distance].fourths + stats[distance].other) + '</span>');
 
 		dis_record.innerHTML += ('<span class="naks_mr_2">' + fire_icon + fire_rate.toFixed(0) + '%' + '</span>');
+		
+		// if(class_stats)
+		// 	dis_record.innerHTML += ('<span class="naks_mr_2">'+"CD"+'</span>');
+		// else 
+		// 	dis_record.innerHTML += ('<span class="naks_mr_2">'+"d"+'</span>');
 
 		if (data.stats[distance].max_speed) {
 			dis_record.innerHTML += ('<span>' + speed_max_icon + data.stats[distance].max_speed.toFixed(0) + '</span>');
 		}
+		
 
 		let color = '';
 
@@ -226,21 +236,23 @@ const updateHorse = (data, nodes, distance) => {
 
 
 		if(
-			(win_rate>=15 && distance_total>=50 && fire_rate>=0) ||
+			(win_rate>=15 && distance_total>=25 && fire_rate>=0) ||
 			(win_rate>=15 && distance_total>=10 && fire_rate>=40) ||
+			(win_rate>=40 && distance_total>=5 && fire_rate>=0) ||
 			(win_rate>=0 && distance_total>=0 && fire_rate>=85)
 		){  
 			dis_record.className += color = ' naks_alert_color';
 			if (!mh) distance_stats.reds++;
 		}else if(
-			(win_rate>=12 && distance_total>=50 && fire_rate>=0) ||
+			(win_rate>=12 && distance_total>=25 && fire_rate>=0) ||
 			(win_rate>=12 && distance_total>=10 && fire_rate>=40) ||
-			(win_rate>=12 && distance_total>=0 && fire_rate>=65)
+			(win_rate>=20 && distance_total>=5 && fire_rate>=0) ||
+			(win_rate>=12 && distance_total>=0 && fire_rate>=70)
 		){  
 			dis_record.className += color = ' naks_warn_color';
 			if (!mh) distance_stats.yellows++;
 		}else if(
-			(win_rate<=8 && distance_total>=50 && fire_rate<=25)
+			(win_rate<=10 && distance_total>=0 && fire_rate<=40)
 		){ 
 			dis_record.className += color = ' naks_mod_color'
 			if (!mh) distance_stats.blues++;
@@ -308,19 +320,19 @@ const updateHorse = (data, nodes, distance) => {
 		}
 
 
-		let nine_twelve = 0;
+		let seven_twelve = 0;
 		let history_total = 0;
 		(data.stats[distance].positions || [])
 			.forEach((a) => {
-				if (a.position >= 9) nine_twelve += a.count;
+				if (a.position >= 7) seven_twelve += a.count;
 				history_total += a.count;
 			});
 
-		if (history_total > 0 && nine_twelve > 0 && nine_twelve / history_total > .50 && history_total > 8) {
+		if (history_total > 0 && seven_twelve > 0 && seven_twelve / history_total > .50 && history_total > 8) {
 			let down_classer = document.createElement("span");
 			down_classer.className = 'racing-tag naks_stats naks_bg_success';
 
-			let down_rate = (nine_twelve / history_total * 100).toFixed(0);
+			let down_rate = (seven_twelve / history_total * 100).toFixed(0);
 
 			down_classer.innerHTML += down_icons + '<span class="naks_mr_2"> ' + down_rate + '%</span>';
 			nodes[1].childNodes[2].appendChild(down_classer);
