@@ -114,6 +114,16 @@ document.addEventListener('DOMContentLoaded', function () {
 	document.getElementById("extension-mode").addEventListener("click", clickMode);
 });
 
+const extract_class = (txt)=>{
+	txt = txt.trim();
+	if(txt=="CLASS I") return 1;
+	if(txt=="CLASS II") return 2;
+	if(txt=="CLASS III") return 3;
+	if(txt=="CLASS IV") return 4;
+	if(txt=="CLASS V") return 5;
+	if(txt=="GRIFFIN") return 0;
+}
+
 const updateHorse = (data, nodes, distance) => {
 
 	cache.push(data);
@@ -130,9 +140,19 @@ const updateHorse = (data, nodes, distance) => {
 		if (!stats) return;
 
 		let class_stats = false;
-		console.log({global_class})
-		if (global_class && global_class != 'all' && data.classes) {
-			stats = data.classes[global_class];
+
+		let this_class;
+		if(window.location.href.startsWith("https://zed.run/racing/events")){
+			this_class = global_class;
+		}else{
+			let el = document.getElementsByClassName("racing-tag--class")[0];
+			// console.log(el.innerText, extract_class(el.innerText))
+			this_class = extract_class(el.innerText)
+		}
+		// console.log({ this_class })
+
+		if (this_class && this_class != 'all' && data.classes) {
+			stats = data.classes[this_class];
 
 			let total = stats[distance].firsts + stats[distance].seconds + stats[distance].thirds + stats[distance].fourths + stats[distance].other;
 			if (total < 9) {
@@ -844,7 +864,14 @@ const loadHorses = () => {
 					}
 
 					// distance_summary_div.innerHTML += '<br/>Have you donated recently?<br/>ETH: 0xc3422b8D7aa4be58C2BA7F07342620D5e13C2cD3<br/>Support: <a href="mailto:hello@stackednaks.com" target="_">hello@stackednaks.com</a>';
-					distance_summary_div.innerHTML += '<br/>Support: <span class="naks_success_text">Discord Danshan11</span>';
+					distance_summary_div.innerHTML += `
+					<br/>
+					Support: <span class="naks_success_text">Discord Danshan11</span>
+					<br />
+					donate to Helping Hands: send ETH to  
+					<br />
+					<span class="naks_success_text">0x447f79769C2d62146815d9eEbeF76Ee23058B18D</span>
+					`;
 
 					naks.appendChild(distance_summary_div);
 
