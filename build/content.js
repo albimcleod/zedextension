@@ -868,9 +868,12 @@ const loadHorses = () => {
 					<br/>
 					Support: <span class="naks_success_text">Discord Danshan11</span>
 					<br />
-					donate to Helping Hands: send ETH to  
 					<br />
-					<span class="naks_success_text">0x447f79769C2d62146815d9eEbeF76Ee23058B18D</span>
+					donate to <span class="naks_success_text">Helping Hands</span> a great charity
+					<br />
+					<a target="_blank" href="https://www.stackednaks.com/">
+						<div class="naks_badge naks_bg_success">Learn More</div>
+					</a>
 					`;
 
 					naks.appendChild(distance_summary_div);
