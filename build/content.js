@@ -550,16 +550,16 @@ const addHorseList = (data, list, show=true) => {
 
 		let make_red = false;
 
-		let nine_twelve = 0;
+		let eight_twelve = 0;
 		let history_total = 0;
 		(data.stats[distance].positions || [])
 			.forEach((a) => {
-				if (a.position >= 9) nine_twelve += a.count;
+				if (a.position >= 8) eight_twelve += a.count;
 				history_total += a.count;
 			});
 
-		if (history_total > 0 && nine_twelve > 0 && nine_twelve / history_total > .50 && history_total > 8) {
-			let down_rate = (nine_twelve / history_total * 100).toFixed(0);
+		if (history_total > 0 && eight_twelve > 0 && eight_twelve / history_total > .50 && history_total > 8) {
+			let down_rate = (eight_twelve / history_total * 100).toFixed(0);
 
 			// horse_div.innerHTML += ('<span class="naks_bg_danger">' + down_icons + '<span class="naks_mr_2"> ' + down_rate + '%</span>');
 			horse_div.innerHTML += `<div class="naks_bg_danger col-flex"> <span>${down_icons}</span>  <span>${(down_rate)}%</span> </div>`;
