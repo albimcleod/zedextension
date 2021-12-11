@@ -502,7 +502,7 @@ const addHorseList = (data, list, show=true) => {
 		horse_div.innerHTML += (' (' + Number(data.fatigue) + ') ');
 	}
 
-	if (!data.is_racing) {
+	if (data.is_racing!==true) {
 		tags.forEach(element => {
 			if (element) {
 				horse_div.innerHTML += ("<span class='naks_badge naks_bg_info naks_mr_2'>" + element.text + "</span>")
@@ -902,15 +902,17 @@ const loadHorses = () => {
 				//if horses are no loaded, then load and cache them
 				if (my_horses.length == 0) {
 					const options = {
-						headers: new Headers({ 'x-api-key': api_key }),
+						// headers: new Headers({ 'x-api-key': api_key }),
 					};
-
-					fetch(host_url + '/horses?stable_id=' + api_key + '&classes=&sort=win_rate&distance=all', options)
+					let api = host_url + '/horses?stable_id=' + api_key + '&classes=&sort=win_rate&distance=all'
+					// console.log(api)
+					fetch(api, options)
 						.then(response => response.json())
 						.then(data => {
 							data.results.forEach(d => my_horses.push(d));
 						})
 						.catch(data => {
+							// console.log(data)
 							my_horses.push({ name: 'Could not load account. Please contact hello@stackednaks.com', details: { class: '' } })
 						});
 				}
@@ -923,11 +925,13 @@ const loadStable = () => {
 	const options = {
 		headers: new Headers({ 'x-api-key': api_key }),
 	};
-
-	fetch(host_url + '/stables/' + api_key, options).then(response => response.json())
+	let api = host_url + '/stables/' + api_key
+	// console.log(api)
+	fetch(api, options).then(response => response.json())
 		.then(data => {
+			// console.log({api_key, stable})
 			stable = data;
-		});
+		}).catch(err=>console.log(err));
 }
 
 //find the public key of from within the webpage
@@ -949,6 +953,7 @@ const initHeader = () => {
 		for (var i = 0, max = links.length; i < max; i++) {
 			if (links[i].href.indexOf('https://explorer-mainnet.maticvigil.com/address/') > -1) {				
 				api_key = links[i].href.split('/')[4];
+				// api_key = ""
 				// console.log(api_key)
 				loadStable();
 				fatigue();
@@ -980,7 +985,8 @@ const freeRaces = () => {
 					free_races.push(r);
 				});
 			})
-			.catch(data => {
+			.catch(err=> {
+				console.log(err)
 				my_horses.push({ name: 'Could not load account', details: { class: '' } })
 			});
 	}
@@ -1021,19 +1027,21 @@ const fatigue = async () => {
 		// let data = class_0.concat(class_1).concat(class_2).concat(class_3).concat(class_4).concat(class_5);
 
 		let data = await get_free_horses({stable_id:api_key, token});
+		// console.log(data)
 
 		data.forEach(h => {
-			let mh = my_horses.find(m => m.id == h.horse_id);
+			let mh = my_horses.find(m => m.id == h.id);
 			if (mh) {
-				mh.details.class = h.class;
-				mh.details.rating = h.rating;
+				mh.details.class = h.details.class;
+				mh.details.rating = h.details.rating;
 			} else {
 				//console.log(h);
 			}
 		});
 
 		my_horses.forEach(h => {
-			h.is_racing = data.find(m => h.id == m.horse_id) == undefined;
+			// h.is_racing = data.find(m => h.id == m.horse_id) == undefined;
+			h.is_racing = false;
 		});
 
 		console.table(my_horses.map(({is_racing, id})=>({id, is_racing,})))
@@ -1176,15 +1184,10 @@ const get_free_horses = async ({stable_id, token, offset=0})=>{
 	const options = {
 		headers: new Headers({ 'authorization': 'Bearer ' + token }),
 	};
-	let ar = [], temp=[]
-	do{
-		let api = `https://api.zed.run/api/v1/races/paid/available_race_horses?public_address=${stable_id}&offset=${offset}`
-		console.log(offset, api)
-		temp = (await fetch(api, options).then(r=>r.json())) || [];
-		ar = [...ar, ...temp]
-		offset+=10
-	}while(temp && temp.length>0)
-	return ar;
+		let api = `https://api.stackednaks.com/horses?stable_id=${api_key}`
+		let data = (await fetch(api, options).then(r=>r.json()))|| {}
+		// console.log("get_free_horses", data?.results?.length)
+		return data?.results || [];
 }
 
 setInterval(() => {
