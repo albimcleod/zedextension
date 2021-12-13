@@ -922,6 +922,7 @@ const loadHorses = () => {
 }
 
 const loadStable = () => {
+	if(!stable) return;
 	const options = {
 		headers: new Headers({ 'x-api-key': api_key }),
 	};
@@ -1209,4 +1210,4 @@ setInterval(() => {
 
 setInterval(() => {
 	freeRaces();
-}, 30000);
+}, 5*60*1000);
