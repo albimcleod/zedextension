@@ -1,6 +1,7 @@
 console.log('StackedNaks loaded');
 
 let cache = [];
+let fetching= [];
 let active_racename = '';
 let race_stats = {};
 let distance_stats = {};
@@ -455,21 +456,34 @@ const run = () => {
 					if (horse_data[1].childNodes.length > 2 && horse_data[1].childNodes[2].className.length > 0) {
 
 						let name = encodeURIComponent(horse_name.trim());
+						// console.log(name)
 
 						let existing = cache.find(h => h.name == name);
+
 						if (existing) {
 							updateHorse(existing, horse_data, selected_distance)
 							break;
 						}
-
 						const options = {
 							headers: new Headers({ 'x-api-key': api_key }),
 						};
-
-						fetch(host_url + '/horses/' + name, options)
+						
+						// console.log(fetching.length, name)
+						let hapi = host_url + '/horses/' + name
+						if(fetching.includes(hapi)) break;
+						else {
+							fetching = Array.from(new Set([...fetching,hapi]));
+							fetch(hapi, options)
 							.then(response => response.json())
-							.then(data => updateHorse(data, horse_data, selected_distance))
-							.catch(data => console.log(data));
+							.then(data => {
+								updateHorse(data, horse_data, selected_distance)
+								// fetching = fetching.filter(e=>e!==hapi)
+							})
+							.catch(data => console.log(data))
+							.finally(()=>{
+								fetching = fetching.filter(e=>e!==hapi)
+							});
+						}
 					}
 
 				}
@@ -1045,7 +1059,7 @@ const fatigue = async () => {
 			h.is_racing = false;
 		});
 
-		console.table(my_horses.map(({is_racing, id})=>({id, is_racing,})))
+		// console.table(my_horses.map(({is_racing, id})=>({id, is_racing,})))
 
 		//my_horses.sort((a, b) => {
 		//	return b.fatigue - a.fatigue;
