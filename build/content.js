@@ -970,8 +970,10 @@ const initHeader = () => {
 				api_key = links[i].href.split('/')[4];
 				// api_key = ""
 				// console.log(api_key)
-				loadStable();
-				fatigue();
+				if (api_key && !stable) {
+					loadStable();
+					fatigue();
+				}
 			}
 			// if (links[i].href.indexOf('https://etherscan.io') > -1) {
 			// 	api_key = links[i].href.split('/').pop();
@@ -1041,23 +1043,30 @@ const fatigue = async () => {
 
 		// let data = class_0.concat(class_1).concat(class_2).concat(class_3).concat(class_4).concat(class_5);
 
+		
 		let data = await get_free_horses({stable_id:api_key, token});
 		// console.log(data)
 
 		data.forEach(h => {
 			let mh = my_horses.find(m => m.id == h.id);
 			if (mh) {
-				mh.details.class = h.details.class;
-				mh.details.rating = h.details.rating;
+				if (mh.details.class != h.details.class || mh.details.rating != h.details.rating) {
+					console.log('change class and rating', mh.name);
+					mh.details.class = h.details.class;
+					mh.details.rating = h.details.rating;
+				}
 			} else {
 				//console.log(h);
 			}
 		});
+		
 
 		my_horses.forEach(h => {
 			// h.is_racing = data.find(m => h.id == m.horse_id) == undefined;
 			h.is_racing = false;
 		});
+
+		
 
 		// console.table(my_horses.map(({is_racing, id})=>({id, is_racing,})))
 
