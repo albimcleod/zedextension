@@ -13,7 +13,7 @@ let selected_distance = 'all';
 let global_class = 'all';
 let extension_mode = 'race';
 let stable = {};
-
+let stable_hids = [];
 let opponent_list = [];
 
 let race_summary = {};
@@ -114,6 +114,16 @@ document.addEventListener('DOMContentLoaded', function () {
 	console.log('DOMContentLoaded');
 	document.getElementById("extension-mode").addEventListener("click", clickMode);
 });
+
+const get_only_hids = async (api_key)=>{
+	let api = host_url + '/hids?stable_id=' + api_key + '&classes=&sort=win_rate&distance=all'
+	let data = await fetch(api).then(r=>r.json());
+	return data?.results || []
+}
+const get_horse = async (hid)=>{
+	let api = host_url + '/horses/' + hid
+	return fetch(api).then(r=>r.json()).catch((ee)=>{return {name:"Couldn't Load"}});
+}
 
 const extract_class = (txt)=>{
 	txt = txt.trim();
@@ -643,7 +653,7 @@ const addHorseList = (data, list, show=true) => {
 	list.appendChild(horse_div);
 }
 
-const loadHorses = () => {
+const loadHorses = async () => {
 
 	var page_content = document.getElementsByClassName("page-content");
 	if (page_content && page_content.length > 0) {
@@ -919,16 +929,25 @@ const loadHorses = () => {
 						// headers: new Headers({ 'x-api-key': api_key }),
 					};
 					let api = host_url + '/horses?stable_id=' + api_key + '&classes=&sort=win_rate&distance=all'
-					// console.log(api)
-					fetch(api, options)
-						.then(response => response.json())
-						.then(data => {
-							data.results.forEach(d => my_horses.push(d));
-						})
-						.catch(data => {
-							// console.log(data)
-							my_horses.push({ name: 'Could not load account. Please contact hello@stackednaks.com', details: { class: '' } })
-						});
+					console.log(api)
+
+					let hids = await get_only_hids(api_key)
+					stable_hids = hids;
+
+					await Promise.all(hids.map((hid,idx)=>{
+					// for(let hid of hids)
+						get_horse(hid).then(d=>my_horses[idx]=(d))
+					}))
+
+					// fetch(api, options)
+					// 	.then(response => response.json())
+					// 	.then(data => {
+					// 		data.results.forEach(d => my_horses.push(d));
+					// 	})
+					// 	.catch(data => {
+					// 		// console.log(data)
+					// 		my_horses.push({ name: 'Could not load account. Please contact hello@stackednaks.com', details: { class: '' } })
+					// 	});
 				}
 			}
 		}
@@ -968,7 +987,6 @@ const initHeader = () => {
 		for (var i = 0, max = links.length; i < max; i++) {
 			if (links[i].href.indexOf('https://explorer-mainnet.maticvigil.com/address/') > -1) {				
 				api_key = links[i].href.split('/')[4];
-				// api_key = ""
 				// console.log(api_key)
 				if (api_key && !stable) {
 					loadStable();
@@ -1042,23 +1060,6 @@ const fatigue = async () => {
 		// let class_0 = await fetch('https://api.zed.run/api/v1/races/paid/available_race_horses?public_address=' + api_key + '&offset=0&horse_name=&race_class=0', options).then(response => response.json());
 
 		// let data = class_0.concat(class_1).concat(class_2).concat(class_3).concat(class_4).concat(class_5);
-
-		
-		let data = await get_free_horses({stable_id:api_key, token});
-		// console.log(data)
-
-		data.forEach(h => {
-			let mh = my_horses.find(m => m.id == h.id);
-			if (mh) {
-				if (mh.details.class != h.details.class || mh.details.rating != h.details.rating) {
-					console.log('change class and rating', mh.name);
-					mh.details.class = h.details.class;
-					mh.details.rating = h.details.rating;
-				}
-			} else {
-				//console.log(h);
-			}
-		});
 		
 
 		my_horses.forEach(h => {
@@ -1214,6 +1215,24 @@ const get_free_horses = async ({stable_id, token, offset=0})=>{
 		return data?.results || [];
 }
 
+const update_stable_each = async (hid)=>{
+	let h = await get_horse(hid)
+		// console.log('update',hid)
+		let mh = my_horses.find(m => m.id == h.id);
+		if (mh) {
+			if (mh.details.class != h.details.class || mh.details.rating != h.details.rating) {
+				// console.log('change class and rating', mh.name);
+				mh.details.class = h.details.class;
+				mh.details.rating = h.details.rating;
+			}
+		}
+}
+
+const update_stable_all = async ()=>{
+	await Promise.all(stable_hids.map(update_stable_each))
+}
+
+
 setInterval(() => {
 	initHeader();
 	loadHorses();
@@ -1232,5 +1251,6 @@ setInterval(() => {
 }, 30000);
 
 setInterval(() => {
-	freeRaces();
-}, 5*60*1000);
+	console.log("update re")
+	update_stable_all();
+}, 120*1000);

@@ -68,9 +68,9 @@
 .nak_list {
   color: white;
   position: fixed;
-  right: 20px;
+  right: 5px;
   /*border: 1px solid white;*/
-  width: 18%;
+  width: max(20em, 19%);
   padding: 5px;
   font-size: 1.2rem;
   border-radius: 7px;
@@ -79,6 +79,8 @@
   margin-top: 5px;
   z-index: 1000;
   top: 115px;
+  max-height: calc(90vh - 115px);
+  overflow-y: auto;
 }
 
 .nak_list_item {
