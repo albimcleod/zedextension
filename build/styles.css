@@ -11,8 +11,14 @@
 
 .naks_stats {
 	border: 1px solid white;
-    padding: 3px;	
+    padding: 0 0.1rem !important;	
 	font-size: 1.1rem!important;
+    min-width: 100px;
+}
+
+.naks_selected {
+  border-width: 2px;
+  border-color: #27b18a!important;    
 }
 
 .naks_alert_color {
@@ -28,6 +34,15 @@
 	background-color: #27b18a!important;    
 }
 
+.naks_name {
+    min-width: 150px;
+    max-width: 150px;
+}
+
+.naks_selected_alert {
+    border-color: turquoise;
+    border-width: 3px;
+}
 
 .naks_mr {
 	margin-right: .8rem;
@@ -72,7 +87,7 @@
 }
 
 .naks_w_85 {
-	width: 85%;
+	width: 95%;
 }
 
 .d-none {
@@ -124,4 +139,8 @@
 
 .naks_highlight_row {
     background-color: rgb(39, 177, 138);;
+}
+
+.career {
+    width: unset !important;
 }

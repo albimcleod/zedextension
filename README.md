@@ -16,3 +16,10 @@ https://javascript-minifier.com/
 Any changes to content.js will not be hotloaded
 Refresh the extension chrome://extensions/
 Relaod the zed.run page
+
+# Deployment
+1. Move contents.js to build folder
+2. Open manifest,json and increment version number
+3. Zip all build files
+4. Open dev console for google and open packages directory
+5. Upload zip and deploy (can take 0-3 days)

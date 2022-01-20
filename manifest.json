@@ -9,7 +9,7 @@
     ],
   "content_scripts": [
    {
-     "matches": ["https://zed.run/*"],
+     "matches": ["https://zed.run/*", "https://www.stackednaks.com/*", "http://localhost:3000/race/*", "https://www.hawku.com/*", "https://knowyourhorses.com/*"],
      "css": ["styles.css"],
      "js": ["content.js"]
    }
