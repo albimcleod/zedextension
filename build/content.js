@@ -726,7 +726,7 @@ const loadHorses = async () => {
 					caches = global_class ? global_class : 'all';
 					let display_distance = selected_distance == 'all' ? 'All Distances' : selected_distance;
 
-					naks.innerHTML += `Don't ZED Blind. <span class="red-text">Blood Tool</span> -contact danshan11`
+					naks.innerHTML += `Don't ZED Blind. <a href="https://www.stackednaks.com/" target="_blank" class="red-text">Blood Tool</a> -contact danshan11`
 					naks.innerHTML += '<hr style="border-top: 1px solid white;"/><span>' + class_name + ' - ' + display_distance + '</span><hr style="border-top: 1px solid white;"/>';
 					// naks.innerHTML += 'StackedNaks - ZedRun Racer<hr style="border-top: 1px solid white;"/><span>' + class_name + ' - ' + display_distance + '</span><hr style="border-top: 1px solid white;"/>';
 					let hids = to_display.map(e=>e.id)
@@ -1279,3 +1279,15 @@ setInterval(() => {
 	console.log("update re")
 	update_stable_all();
 }, 120*1000);
+
+const rem_next_races = ()=>{
+  let el = document.querySelector(".next-race-list");
+  if(el) el.remove()
+}
+
+const init_fn = ()=>{
+	document.onscroll = ()=>{
+		rem_next_races();
+	}
+}
+init_fn();
