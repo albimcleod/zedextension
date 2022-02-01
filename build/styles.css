@@ -166,3 +166,11 @@
   border: 1px solid #27B18A;
   box-shadow: 0 0 1px 2px #27B18A; 
 }
+.price_tag {
+  background-color: #A349A4 !important;
+  color: white !important;
+  font-size: 1.1rem;
+}
+.price_tag a{
+  color: white !important;
+}

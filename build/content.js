@@ -40,8 +40,13 @@ let open_icon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" 
 
 let down_icons = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down-circle" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V4.5z"/></svg>`
 
+// let eth_icon = `<img width="16" height="16" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Ethereum-icon-purple.svg/512px-Ethereum-icon-purple.svg.png" alt="" />`
+let eth_icon = '<svg width="12" height="12" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="ethereum" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" class="svg-inline--fa fa-ethereum fa-w-10 fa-2x"><path fill="white" d="M311.9 260.8L160 353.6 8 260.8 160 0l151.9 260.8zM160 383.4L8 290.6 160 512l152-221.4-152 92.8z" class=""></path></svg>'
+
 const host_url = 'https://api.stackednaks.com';
 //const host_url = 'http://localhost:3001'
+
+const os = hid=>`https://opensea.io/assets/matic/0xa5f1ea7df861952863df2e8d1312f7305dabf215/${hid}`
 
 const distances = [
 	{ id: 'all', text: 'All' },
@@ -370,6 +375,26 @@ const updateHorse = (data, nodes, distance) => {
 
 			if (!mh) distance_stats.downers++;
 		}
+
+		// let price = data?.horsead ?? null;
+		// let id = data.id
+		// console.log(id, data, data.horsead)
+		// if(price!==null){
+		// 	let pricetag = document.createElement("span");
+		// 	pricetag.className = 'racing-tag naks_stats price_tag naks_mr naks_mt';
+
+		// 	let down_rate = (seven_twelve / history_total * 100).toFixed(0);
+
+		// 	// pricetag.innerHTML += eth_icon + '<span class="naks_mr_2"> FOR SALE <br/>' + parseFloat(price).toFixed(2) +'</span>';
+		// 	pricetag.innerHTML += `
+		// 	<a href="${os(id)}" target="_blank" >
+		// 		<span class="for_sale_tag" >BUY</span>
+		// 		${eth_icon}<span class="naks_mr_2">${parseFloat(price).toFixed(2)}</span>
+		// 	</a>
+		// 	`
+		// 	nodes[1].childNodes[2].appendChild(pricetag);
+		// }
+
 
 	}
 }
@@ -888,17 +913,17 @@ const loadHorses = async () => {
 					}
 
 					// distance_summary_div.innerHTML += '<br/>Have you donated recently?<br/>ETH: 0xc3422b8D7aa4be58C2BA7F07342620D5e13C2cD3<br/>Support: <a href="mailto:hello@stackednaks.com" target="_">hello@stackednaks.com</a>';
-					distance_summary_div.innerHTML += `
-					<br/>
-					Support: <span class="naks_success_text">Discord Danshan11</span>
-					<br />
-					<br />
-					donate to <span class="naks_success_text">Helping Hands</span> a great charity
-					<br />
-					<a target="_blank" href="https://www.stackednaks.com/">
-						<div class="naks_badge naks_bg_success">Learn More</div>
-					</a>
-					`;
+					// distance_summary_div.innerHTML += `
+					// <br/>
+					// Support: <span class="naks_success_text">Discord Danshan11</span>
+					// <br />
+					// <br />
+					// donate to <span class="naks_success_text">Helping Hands</span> a great charity
+					// <br />
+					// <a target="_blank" href="https://www.stackednaks.com/">
+					// 	<div class="naks_badge naks_bg_success">Learn More</div>
+					// </a>
+					// `;
 
 					naks.appendChild(distance_summary_div);
 

@@ -1,132 +1,138 @@
 .naks_header {
-    color: white;
-    text-align: center;
-    padding-top: 10px;
-	padding-bottom: 10px;
+  color: white;
+  text-align: center;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 .naks_icon {
-	margin-right: 10px;
+  margin-right: 10px;
 }
 
 .naks_stats {
-	border: 1px solid white;
-    padding: 3px;	
-	font-size: 1.1rem!important;
+  border: 1px solid white;
+  padding: 3px;
+  font-size: 1.1rem !important;
 }
 
 .naks_alert_color {
-   background: red !important;
+  background: red !important;
 }
 
 .naks_warn_color {
-	background-color: #ffc107!important;
-    color: black!important;
+  background-color: #ffc107 !important;
+  color: black !important;
 }
 
 .naks_success_color {
-	background-color: #27b18a!important;    
+  background-color: #27b18a !important;
 }
 
-
 .naks_mr {
-	margin-right: .8rem;
+  margin-right: 0.8rem;
 }
 
 .naks_mr_2 {
-	margin-right: .2rem;
+  margin-right: 0.2rem;
 }
 
 .naks_mt {
-	margin-top: .8rem;
+  margin-top: 0.8rem;
 }
 
 .naks_mb {
-	margin-bottom: .8rem;
+  margin-bottom: 0.8rem;
 }
 
 .naks_pill {
-    min-width: 2rem;
+  min-width: 2rem;
 }
-
 
 .nak_list {
-	color: white;
-    position: fixed;
-    right: 20px;
-    /*border: 1px solid white;*/
-    width: 20%;
-    padding: 5px;
-	font-size: 1.2rem;
-	border-radius: 7px;
-    background-color: #3b4047;
-	margin-top: 5px;
-	z-index: 1000;
-	top: 115px;
+  color: white;
+  position: fixed;
+  right: 20px;
+  /*border: 1px solid white;*/
+  width: 20%;
+  padding: 5px;
+  font-size: 1.2rem;
+  border-radius: 7px;
+  background-color: #3b4047;
+  margin-top: 5px;
+  z-index: 1000;
+  top: 115px;
 }
 
-.nak_list_item { 
-	padding: 3px;
-	margin-bottom: 2px;
-	border-radius: 2px;
+.nak_list_item {
+  padding: 3px;
+  margin-bottom: 2px;
+  border-radius: 2px;
 }
 
 .naks_w_85 {
-	width: 85%;
+  width: 85%;
 }
 
 .d-none {
-	display: none;
+  display: none;
 }
 
 .buy-in-content .race-horse-list .racehorse {
-    width: 80%!important;
+  width: 80% !important;
 }
 
-
 .naks_badge {
-    display: inline-block;
-    padding: .35em .65em;
-    font-size: .75em;
-    font-weight: 700;
-    line-height: 1;
-    color: #fff;
-    text-align: center;
-    white-space: nowrap;
-    vertical-align: baseline;
-    border-radius: .25rem;
+  display: inline-block;
+  padding: 0.35em 0.65em;
+  font-size: 0.75em;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: 0.25rem;
 }
 
 .naks_bg_info {
-    background-color: #0dcaf0!important;
-    color: black!important;
-    font-size: 1.1rem!important;
+  background-color: #0dcaf0 !important;
+  color: black !important;
+  font-size: 1.1rem !important;
 }
 
 .naks_bg_success {
-    background-color: #27b18a!important;
-    color: black!important;
-    font-size: 1.1rem!important;
+  background-color: #27b18a !important;
+  color: black !important;
+  font-size: 1.1rem !important;
 }
 
 .naks_distance_stats {
-    text-align: left;
-    display: flex !important;
-    width: 100%;
-    border: 1px solid white;
-    padding: 3px;	
-    font-size: 1.5rem!important;
+  text-align: left;
+  display: flex !important;
+  width: 100%;
+  border: 1px solid white;
+  padding: 3px;
+  font-size: 1.5rem !important;
 }
 
 .w_25 {
-    width: 25%
+  width: 25%;
 }
 
 .naks_highlight_row {
-    background-color: rgb(39, 177, 138);;
+  background-color: rgb(39, 177, 138);
 }
 
-.nak_list{
-    max-height: 70vh;
-    overflow-y: auto;
+.nak_list {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.price_tag {
+  background-color: #ff5733 !important;
+  font-size: 1.5rem !important;
+}
+.for_sale_tag{
+  font-size: 1.3rem;
+  line-height: 70% !important;
 }
