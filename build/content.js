@@ -131,13 +131,15 @@ const get_horse = async (hid)=>{
 }
 
 const extract_class = (txt)=>{
+	console.log("class txt",txt)
 	txt = txt.trim();
-	if(txt=="CLASS I") return 1;
-	if(txt=="CLASS II") return 2;
-	if(txt=="CLASS III") return 3;
-	if(txt=="CLASS IV") return 4;
-	if(txt=="CLASS V") return 5;
-	if(txt=="GRIFFIN") return 0;
+	if(["CLASS I",   "I"].includes(txt))   return 1;
+	if(["CLASS II",  "II"].includes(txt))  return 2;
+	if(["CLASS III", "III"].includes(txt)) return 3;
+	if(["CLASS IV",  "IV"].includes(txt))  return 4;
+	if(["CLASS V",   "V"].includes(txt))   return 5;
+	if(["CLASS VI",  "VI"].includes(txt))  return 6;
+	if(["DISCOVERY", "D"].includes(txt)) return 0;
 }
 
 const updateHorse = (data, nodes, distance) => {
@@ -162,7 +164,7 @@ const updateHorse = (data, nodes, distance) => {
 			this_class = global_class;
 		}else{
 			let el = document.getElementsByClassName("racing-tag--class")[0];
-			// console.log(el.innerText, extract_class(el.innerText))
+			console.log(el.innerText, extract_class(el.innerText))
 			this_class = extract_class(el.innerText)
 		}
 		// console.log({ this_class })
@@ -695,7 +697,10 @@ const loadHorses = async () => {
 						let button = round_buttons[i];
 
 						if (button.className.indexOf('btn-outline-secondary') > -1) {
-							if (button.className.indexOf('horse-class-5') > -1) {
+							if (button.className.indexOf('horse-class-6') > -1) {
+								global_class = 6;
+								class_name = 'Class 6';
+							} else if (button.className.indexOf('horse-class-5') > -1) {
 								global_class = 5;
 								class_name = 'Class 5';
 							} else if (button.className.indexOf('horse-class-4') > -1) {
@@ -712,10 +717,11 @@ const loadHorses = async () => {
 								class_name = 'Class 1';
 							} else if (button.className.indexOf('horse-class-0') > -1) {
 								global_class = 0;
-								class_name = 'Class G';
+								class_name = 'Discovery';
 							}
 						}
-						if (global_class != undefined) to_display = my_horses.filter(d => d.details.class == global_class);
+						if (global_class != undefined) 
+							to_display = my_horses.filter(d => d.details.class == global_class);
 					}
 					while (naks.firstChild) {
 						naks.removeChild(naks.lastChild);
