@@ -114,8 +114,15 @@ const clickMode = () => {
 	console.log('clickMode', extension_mode)
 }
 
+
+document.addEventListener('DOMContentLoaded', function () {
+	console.log('DOMContentLoaded');
+	document.getElementById("extension-mode").addEventListener("click", clickMode);
+});
+
 const get_only_hids = async (api_key)=>{
 	let api = host_url + '/hids?stable_id=' + api_key + '&classes=&sort=win_rate&distance=all'
+	console.log(api)
 	let data = await fetch(api).then(r=>r.json());
 	return data?.results || []
 }
@@ -726,7 +733,7 @@ const loadHorses = async () => {
 					caches = global_class ? global_class : 'all';
 					let display_distance = selected_distance == 'all' ? 'All Distances' : selected_distance;
 
-					naks.innerHTML += `Don't ZED Blind. <a href="https://www.stackednaks.com/" target="_blank" class="red-text">Blood Tool</a> -contact danshan11`
+					naks.innerHTML += `Don't ZED Blind. <a href="https://www.stackednaks.com/" target="_blank" class="red-text">Blood Tool</a> -contact danshan11 <br /> `
 					naks.innerHTML += '<hr style="border-top: 1px solid white;"/><span>' + class_name + ' - ' + display_distance + '</span><hr style="border-top: 1px solid white;"/>';
 					// naks.innerHTML += 'StackedNaks - ZedRun Racer<hr style="border-top: 1px solid white;"/><span>' + class_name + ' - ' + display_distance + '</span><hr style="border-top: 1px solid white;"/>';
 					let hids = to_display.map(e=>e.id)
@@ -1297,15 +1304,10 @@ const init_banner = ()=>{
 	tourney_banner.innerHTML = `<a target="_blank" href="${tlink}" >${ttxt}</a>`
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-	console.log('DOMContentLoaded');
-	document.getElementById("extension-mode").addEventListener("click", clickMode);
-});
-
 const init_fn = ()=>{
 	document.onscroll = ()=>{
 		rem_next_races();
 	}
 }
 init_fn();
-setTimeout(init_banner,5000)
+setTimeout(init_banner,6000)
