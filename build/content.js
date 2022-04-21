@@ -114,12 +114,6 @@ const clickMode = () => {
 	console.log('clickMode', extension_mode)
 }
 
-
-document.addEventListener('DOMContentLoaded', function () {
-	console.log('DOMContentLoaded');
-	document.getElementById("extension-mode").addEventListener("click", clickMode);
-});
-
 const get_only_hids = async (api_key)=>{
 	let api = host_url + '/hids?stable_id=' + api_key + '&classes=&sort=win_rate&distance=all'
 	let data = await fetch(api).then(r=>r.json());
@@ -1291,9 +1285,27 @@ const rem_next_races = ()=>{
   if(el) el.remove()
 }
 
+const init_banner = ()=>{
+	console.log("init_banner();")
+	let el = document.querySelector(".tournament-banner");
+	if(!el) return;
+	let tourney_banner = document.createElement('div')
+	tourney_banner.classList.add("tourney-banner")
+	el.parentElement.append(tourney_banner)
+	const tlink = `https://zed-tourney.vercel.app/`
+	const ttxt = `Join Danshan ZED tourneys NOW`
+	tourney_banner.innerHTML = `<a target="_blank" href="${tlink}" >${ttxt}</a>`
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+	console.log('DOMContentLoaded');
+	document.getElementById("extension-mode").addEventListener("click", clickMode);
+});
+
 const init_fn = ()=>{
 	document.onscroll = ()=>{
 		rem_next_races();
 	}
 }
 init_fn();
+setTimeout(init_banner,5000)

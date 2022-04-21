@@ -231,3 +231,19 @@
     width: 115rem !important;
   }
 }
+
+.tourney-banner a {
+  color: white;
+  text-decoration: none;
+}
+.tourney-banner {
+  align-items: center;
+  background: linear-gradient(200.17deg,#375B55 .35%,rgba(42,46,53,.239) 171.26%),#2a2e35;
+  border-radius: 4px;
+  box-shadow: 0 4px 4px rgba(0,0,0,.25);
+  display: flex;
+  justify-content: center;
+  min-height: 6rem;
+  width: 100%;
+  font-size: 2rem;
+}
