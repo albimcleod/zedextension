@@ -1310,4 +1310,4 @@ const init_fn = ()=>{
 	}
 }
 init_fn();
-setTimeout(init_banner,6000)
+// setTimeout(init_banner,6000)
