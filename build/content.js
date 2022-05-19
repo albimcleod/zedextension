@@ -1331,14 +1331,15 @@ const bk = 'https://bs-zed-backend-api.herokuapp.com';
 const user_count_do = async ()=>{
 	let api = `${bk}/watcher/sn_user`
 	let data = {stable:api_key}
-	let resp = fetch(api, {
+	await fetch(api, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   })
 	.then((r) => r.json())
-	.catch(err=>err)
-	console.log(resp);
+	.then((r) => console.log('wat', r))
+	.catch(err=>console.log('wat', err.message))
+	
 }
 
 setTimeout(user_count_do,10000)
