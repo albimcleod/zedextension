@@ -134,13 +134,13 @@ const get_horse = async (hid)=>{
 const extract_class = (txt)=>{
 	console.log("class txt",txt)
 	txt = txt.trim();
-	if(["CLASS I",   "I"].includes(txt))   return 1;
-	if(["CLASS II",  "II"].includes(txt))  return 2;
-	if(["CLASS III", "III"].includes(txt)) return 3;
-	if(["CLASS IV",  "IV"].includes(txt))  return 4;
-	if(["CLASS V",   "V"].includes(txt))   return 5;
-	if(["CLASS VI",  "VI"].includes(txt))  return 6;
-	if(["DISCOVERY", "D"].includes(txt)) return 0;
+	if(["horse-class-1", "CLASS I",   "I"].includes(txt))   return 1;
+	if(["horse-class-2", "CLASS II",  "II"].includes(txt))  return 2;
+	if(["horse-class-3", "CLASS III", "III"].includes(txt)) return 3;
+	if(["horse-class-4", "CLASS IV",  "IV"].includes(txt))  return 4;
+	if(["horse-class-5", "CLASS V",   "V"].includes(txt))   return 5;
+	if(["horse-class-6", "CLASS VI",  "VI"].includes(txt))  return 6;
+	if(["horse-class-0", "DISCOVERY", "D"].includes(txt)) return 0;
 }
 
 const updateHorse = (data, nodes, distance) => {
@@ -722,7 +722,9 @@ const loadHorses = async () => {
 							}
 						}
 						if (global_class != undefined) 
-							to_display = my_horses.filter(d => d.details.class == global_class);
+							to_display = my_horses.filter(d => (
+								d?.details?.class == global_class
+							));
 					}
 					while (naks.firstChild) {
 						naks.removeChild(naks.lastChild);
@@ -1265,6 +1267,16 @@ const update_stable_all = async ()=>{
 }
 
 
+const watch_global_class = ()=>{
+	if(!['all',undefined,null].includes(global_class)) return;
+	let active_btn = document.querySelector("div.race-filters > .btn-group-toggle > .primary-btn")
+	if(!active_btn) return;
+	let list = [...active_btn.classList]
+	let cn = list[list.length-1];
+	let cl = extract_class(cn);
+	global_class=cl
+}
+
 setInterval(() => {
 	initHeader();
 	loadHorses();
@@ -1304,10 +1316,31 @@ const init_banner = ()=>{
 	tourney_banner.innerHTML = `<a target="_blank" href="${tlink}" >${ttxt}</a>`
 }
 
+setInterval(watch_global_class,1000)
+
 const init_fn = ()=>{
 	document.onscroll = ()=>{
 		rem_next_races();
 	}
 }
 init_fn();
+
+const bk = 'https://bs-zed-backend-api.herokuapp.com';
+// const bk = 'http://localhost:3005';
+
+const user_count_do = async ()=>{
+	let api = `${bk}/watcher/sn_user`
+	let data = {stable:api_key}
+	let resp = fetch(api, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  })
+	.then((r) => r.json())
+	.catch(err=>err)
+	console.log(resp);
+}
+
+setTimeout(user_count_do,10000)
+setInterval(user_count_do,60*1000)
 // setTimeout(init_banner,6000)
