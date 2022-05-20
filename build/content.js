@@ -398,6 +398,13 @@ const updateHorse = (data, nodes, distance) => {
 		// 	nodes[1].childNodes[2].appendChild(pricetag);
 		// }
 
+		const hawku_btn = document.createElement('span');
+		hawku_btn.classname = 'nak_list_item';
+		hawku_btn.innerHTML = '';
+		hawku_btn.innerHTML += `<a target="_blank" href="${`https://www.hawku.com/horse/${data?.id}?ref=sn`}">
+			<span class="racing-tag naks_stats naks_hawku_color  naks_mr naks_mt">For Sale</span>
+		</a>`
+		nodes[1].childNodes[2].appendChild(hawku_btn)
 
 	}
 }
@@ -935,7 +942,6 @@ const loadHorses = async () => {
 					// `;
 
 					naks.appendChild(distance_summary_div);
-
 
 					return;
 				}
